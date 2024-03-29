@@ -1,0 +1,20 @@
+.dark{
+    background-color: #ca48bf !important;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+small{
+    font-size: 10px !important;
+}
+.main-card{
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+}
+
+@media(width > 700px){
+    .form-control{
+        width: 500px !important;
+    }
+}
