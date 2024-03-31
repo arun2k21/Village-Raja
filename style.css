@@ -9,10 +9,80 @@ small{
     font-size: 10px !important;
 }
 .main-card{
-    border-top-left-radius: 50px;
-    border-top-right-radius: 50px;
+    border-top-left-radius: 60px;
+    border-top-right-radius: 60px;
+}
+.categories{
+    gap: 40px;
+}
+input:focus{
+    border: none;
+    outline: none !important;
+}
+.categories div{
+height: 75px;
+width: 75px;
+}
+.img-fluid{
+    height: 100px !important;
+    width: 100px !important;
+    max-width: 100px !important;
+    max-height: 100px !important;
+}
+.description{
+    font-size: 14px;
+    height: 80px !important;
+}
+.food-card{
+    height: 200px !important;
+    border-radius: 1.375rem  !important;
+    padding: 10px;
+}
+.light{
+    background: #feecff !important;
+}
+.badge{
+    padding: 3px 3px !important;
+}
+.btn{
+    padding: 4px 15px !important;
+}
+.btn-secondary{
+    background: #ca48bf !important;
+    color: #fff !important;
+    border: none !important;
+}
+.list-group{
+    font-size: 13px;
+    font-weight: 600;
+}
+.payment-summary{
+    font-size: 14px;
+    font-weight: 500;
 }
 
+.navbar-brand:hover,.nav-link:hover{
+    color: #ffd0fd !important;
+    transition: 0.5s;
+}
+.cart-icon:hover{
+    transform: scale(1.2);
+    transition: 0.6s;
+}
+.add-cart:hover{
+    background: white !important;
+    color: #ca48bf !important;
+    transition: 0.4s;
+}
+
+::-webkit-scrollbar{
+    width: 2px;
+}
+@media(width < 500px){
+    .village-logo{
+        font-size: 15px !important;
+    }
+}
 @media(width > 700px){
     .form-control{
         width: 500px !important;
