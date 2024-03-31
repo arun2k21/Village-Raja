@@ -2,6 +2,7 @@ ZOHO.CREATOR.init()
         .then((data)=> {
 
             // var login_user = ZOHO.CREATOR.UTIL.getInitParams();
+            
             const products = async (category,product)=> {
                 config = {
                     appName : "village-raja-order-management",
@@ -34,7 +35,7 @@ ZOHO.CREATOR.init()
                        <div class="col-4">
                          <div class="card-body text-center"><img src="${product_img}" class="img-fluid rounded">
                          <div class="w-100 text-center mt-2" id='btn-type${i}' >
-                         <button type="button" class="btn btn-secondary add-cart btn-sm shadow" id='btn-${i}'>Add</button>
+                         <button class="btn btn-secondary add-cart btn-sm shadow" id='btn-${i}'>Add</button>
                          </div>
                          <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock} in stock</small>
                          </div>
@@ -46,12 +47,54 @@ ZOHO.CREATOR.init()
              </div>`;
              const card_group = document.querySelector("#product-card");
              card_group.innerHTML = card;
-
            }
+           const add_cart = await addToCart(itemArr);
+           const item_qty =await itemQty(itemArr);
             }
-products();
+           products();
 
-           
-            
-            // ZC Ends
+          //  Add Item to cart
+           const addToCart = (itemArr)=>{
+            for (let i = 0; i < itemArr.length; i++) {
+              const addBtn = document.querySelector(`#btn-${i}`);
+              addBtn.addEventListener("click",()=>{
+                const rangeBtn = `<div class="quantity text-white d-flex justify-content-center">
+                <button class="border-0 px-2 add-cart dark rounded-start text-white" id='decrease-${i}'>-</button>
+                <div class="p-1 px-2 dark h-100" id='qty${i}' >1</div>
+                <button class="border-0 px-2 add-cart dark rounded-end text-white" id='increase-${i}'>+</button>
+            </div>`;
+            const btnType = document.querySelector(`#btn-type${i}`);
+            btnType.innerHTML = rangeBtn;
+            const cartItem = `<div class="row align-items-center">
+            <div class="p-1 col-8">${itemArr[i].Item_Name}</div>
+            <div class="p-1 col-2"><div class="w-100 text-center align-items-center">
+              <div class="quantity text-white d-flex justify-content-center">
+                  <button class="border-0 px-2 add-cartc dark rounded-start text-white">-</button>
+                  <div class="p-1 px-2 dark h-100">1</div>
+                  <button class="border-0 px-2 add-cart dark rounded-end text-white">+</button>
+              </div>
+            </div></div>
+            <div class="p-1 col-2"><div class="text-end">₹${itemArr[i].Selling_Price}</div></div>  
+          </div>`;
+          const list_group = document.querySelector(".list-group");
+          list_group.classList.remove("d-none");
+          const list_item = document.createElement("li");
+          list_item.className = "list-group-item align-items-center";
+          list_item.innerHTML = cartItem;
+          list_group.appendChild(list_item);
+
+              })
+            }
+           }
+
+          //  Qty Adjuster
+           const itemQty = (itemArr)=>{
+            for (let i = 0; i < itemArr.length; i++) {
+              
+              
+            }
+           }
+
+
+          
         });
