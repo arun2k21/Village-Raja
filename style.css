@@ -47,9 +47,6 @@ width: 75px;
 .btn{
     padding: 4px 15px !important;
 }
-nav{
-    z-index: 1000;
-}
 .w-90{
     width: 90%;
 }
