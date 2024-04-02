@@ -17,8 +17,7 @@ ZOHO.CREATOR.init()
       const itemArr = productsArr.data;
       let card = "";
       for (i = 0; i < itemArr.length; i++) {
-        const img_api = itemArr[i].Item_Image ? itemArr[i].Item_Image : "";
-        const product_img = "https://creatorapp.zoho.in" + img_api;
+        const product_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Products/${itemArr[i].ID}/Item_Image/download?privatelink=xUYDukHBOx3MP6td5erphGJ1ZBrqa8gypZTZTBrK8Kyjh8KxQzFvYrXzGpg8ADqtjGSdrTUqV1SuNX0JzdvAnbSgXTeYaKOSTXOE`;
         card += `<div class="col-lg-6 col-md-6 col-12 mt-3" id='card-group${i}'>
                <div class="row">
                  <div class="col-12">

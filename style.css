@@ -47,6 +47,12 @@ width: 75px;
 .btn{
     padding: 4px 15px !important;
 }
+nav{
+    z-index: 1000;
+}
+.w-90{
+    width: 90%;
+}
 .navbar-nav{
     flex-direction: row !important;
 }
@@ -89,7 +95,10 @@ width: 75px;
         height: 80px !important;
         width: 80px !important;
     }
-
+    .cat img{
+        height: 50px;
+        width: 50px;
+    }
 }
 @media(width > 700px){
     .form-control{
