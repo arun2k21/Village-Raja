@@ -4,7 +4,7 @@ ZOHO.CREATOR.init()
     // var login_user = ZOHO.CREATOR.UTIL.getInitParams();
 
     const products = async (category) => {
-      let filter ="Item_Name != null";
+      let filter = "Item_Name != null";
       config = {
         appName: "village-raja-order-management",
         reportName: "All_Products",
@@ -48,9 +48,9 @@ ZOHO.CREATOR.init()
         const card_group = document.querySelector("#product-card");
         card_group.innerHTML = card;
       }
-      const add_cart = await addToCart(itemArr);
-      const item_qty = await itemQty(itemArr);
-      const search_item = await searchItem(itemArr);
+      await getCategory();
+      await addToCart(itemArr);
+      await searchItem(itemArr);
     }
     products();
 
@@ -70,12 +70,12 @@ ZOHO.CREATOR.init()
             <div class="p-1 col-8">${itemArr[i].Item_Name}</div>
             <div class="p-1 col-2"><div class="w-100 text-center align-items-center">
               <div class="quantity text-white d-flex justify-content-center">
-                  <button class="border-0 px-2 add-cart dark rounded-start text-white">-</button>
-                  <div class="p-1 px-2 dark h-100">1</div>
-                  <button class="border-0 px-2 add-cart dark rounded-end text-white">+</button>
+                  <button class="border-0 px-2 add-cart dark rounded-start text-white" id='decrease-cart-${i}'>-</button>
+                  <div class="p-1 px-2 dark h-100" id="qty-cart-${i}">1</div>
+                  <button class="border-0 px-2 add-cart dark rounded-end text-white" id='increase-cart-${i}'>+</button>
               </div>
             </div></div>
-            <div class="p-1 col-2"><div class="text-end">₹${itemArr[i].Selling_Price}</div></div>  
+            <div class="p-1 col-2"><div class="text-end" id="sub-total-${i}">₹${itemArr[i].Selling_Price}</div></div>  
           </div>`;
           const list_group = document.querySelector(".list-group");
           list_group.classList.remove("d-none");
@@ -83,17 +83,69 @@ ZOHO.CREATOR.init()
           list_item.className = "list-group-item align-items-center";
           list_item.innerHTML = cartItem;
           list_group.appendChild(list_item);
-
+          itemQty(i, itemArr[i].Selling_Price);
         })
       }
     }
 
     //  Qty Adjuster
-    const itemQty = (itemArr) => {
-      for (let i = 0; i < itemArr.length; i++) {
+    const itemQty = (i, price) => {
+      const incr_btn = document.querySelector(`#increase-${i}`);
+      const item_price = document.querySelector(`#sub-total-${i}`);
+      const crnt_qty = document.querySelector(`#qty${i}`);
+      const cart_qty = document.querySelector(`#qty-cart-${i}`);
+      let qty = parseInt(crnt_qty.textContent) ;
+      incr_btn.addEventListener("click", () => {
+        const b = qty +1;
+        crnt_qty.textContent = b;
+        cart_qty.textContent = b;
+        item_price.textContent = b * parseFloat(price);
+        itemQty(i, price);
+      })
+     
+      const incr_btn_cart = document.querySelector(`#increase-cart-${i}`);
+      incr_btn_cart.addEventListener("click", () => {
+        const b = qty +1;
+        crnt_qty.textContent = b;
+        cart_qty.textContent = b;
+        item_price.textContent = b * parseFloat(price);
+        itemQty(i, price);
+      })
 
-      }
+        const dcrs_btn = document.querySelector(`#decrease-${i}`);
+        dcrs_btn.addEventListener("click",()=>{
+          if (qty > 0)
+          {
+          const c = qty -1;
+          crnt_qty.textContent = c;
+          cart_qty.textContent = c;
+          item_price.textContent = c * parseFloat(price);
+          }
+          else{
+            const btnType = document.querySelector(`#btn-type${i}`);
+            btnType.innerHTML = `<button class="btn btn-secondary add-cart btn-sm shadow" id='btn-${i}'>Add</button>`;
+          }
+          itemQty(i, price);
+        });
+        const dcrs_cart_btn = document.querySelector(`#decrease-cart-${i}`);
+        dcrs_cart_btn.addEventListener("click",()=>{
+          if(qty > 1)
+          {
+            const d = qty -1;
+          crnt_qty.textContent = d;
+          cart_qty.textContent = d;
+          item_price.textContent = d * parseFloat(price);
+          }
+          else{
+            const btnType = document.querySelector(`#btn-type${i}`);
+        btnType.innerHTML = `<button class="btn btn-secondary add-cart btn-sm shadow" id='btn-${i}'>Add</button>`;
+          }
+          itemQty(i, price);
+        })
+      
     }
+
+
     // Search Bar
     const searchItem = (itemArr) => {
       const search = document.querySelector("#search-input");
@@ -107,42 +159,42 @@ ZOHO.CREATOR.init()
           const text_value = element.textContent.toLowerCase();
           const product = document.querySelector(`#card-group${i}`);
           if (text_value.includes(search_value)) {
-            
+
             product.classList.remove("d-none");
           }
           else {
             product.classList.add("d-none");
           }
-
-
         }
-
       })
     }
 
     // Category Filter
 
-    const getCategory =async (itemArr)=>{
+    const getCategory = async () => {
       config = {
         appName: "village-raja-order-management",
         reportName: "All_Categories",
       }
       const category_response = await ZOHO.CREATOR.API.getAllRecords(config);
       const cate_list = category_response.data;
-      const dropdown = document.querySelector("#categories");
-      let new_category = "";
-      for (let i = 0; i < cate_list.length; i++) {
-        const element = cate_list[i];
-         new_category += `<li><a class="dropdown-item cursor-pointer" id="cat-${i}" >${element.Category}</a></li>`;
-      }
-      dropdown.innerHTML = new_category;
-      await catgoryFilter(cate_list,itemArr);
+      let cat_html = ``;
+      let x = 0;
+      cate_list.forEach(element => {
+        x = x + 1;
+        cat_html += `<div class="text-center category cursor-pointer" id="cat-${x}">
+    <div class="cat rounded-circle"><img src="#" alt="" height="75" width="75" class="rounded-circle"></div>
+    <div class="text-secondary fw-bold">${element.Category}</div>
+  </div>`;
+      });
+      const cat_group = document.querySelector("#all-category");
+      cat_group.innerHTML = cat_html;
     }
 
 
- 
 
 
 
 
+    // ZC Ends
   });

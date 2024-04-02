@@ -25,11 +25,11 @@
             </form>
           </li>
           <li class="nav-item position-relative mx-4">
-            <div class="cursor-pointer cart-icon" data-bs-toggle="modal" data-bs-target="#cart  ">
+            <div class="cursor-pointer cart-icon" data-bs-toggle="modal" data-bs-target="#mycart">
               <i class="bi bi-cart-check-fill fs-3 text-white"></i>
               <span class="badge text-bg-danger position-absolute">4</span>
             </div>
-            <div class="modal fade" id="cart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="mycart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog modal-dialog-scrollable">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -67,15 +67,12 @@
     <div class="main-card bg-white border-0 h-100">
         <div class="container-fluid p-2">
           <div class="justify-content-center d-flex">
-            <div class="d-flex p-2 gap-4 overflow-x-auto rounded">
-              <div class="text-center category">
-                <div class="cat border rounded-circle"><img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_288,h_360/v1675667625/PC_Creative%20refresh/Biryani_2.png" height="75" width="75" class="rounded-circle"></div>
-                <div class="text-secondary fw-bold">Milk</div>
-              </div>
+            <div class="d-flex p-2 gap-4 overflow-x-auto rounded" id="all-category">
+              <!-- JS Data -->
             </div>
           </div>
           <div class="row" id="product-card">
-            <!-- JS -->
+            <!-- JS Data -->
           </div>
         </div>
       </div>
@@ -88,5 +85,4 @@
     <script src="https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
     <script src="script.js"></script>
 </body>
-
 </html>
