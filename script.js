@@ -35,7 +35,7 @@ ZOHO.CREATOR.init()
                        <div class="col-4">
                          <div class="card-body text-center"><img src="${product_img}" class="img-fluid rounded">
                          <div class="w-100 text-center mt-2" id='btn-type${i}' >
-                         <button class="btn btn-secondary add-cart btn-sm shadow" id='btn-${i}'>Add</button>
+                         <button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" index-no="${i}" id='btn-${i}'>Add</button>
                          </div>
                          <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock} in stock</small>
                          </div>
@@ -45,88 +45,93 @@ ZOHO.CREATOR.init()
                  </div>
                </div>
              </div>`;
-        
+
       }
       const card_group = document.querySelector("#product-card");
-        card_group.innerHTML = card;
+      card_group.innerHTML = card;
       await getCategory();
-      await addToCart(itemArr);
       await searchItem(itemArr);
+      return itemArr;
     }
-    products();
+
 
     //  Add Item to cart
-    const addToCart = (itemArr) => {
-      for (let i = 0; i < itemArr.length; i++) {
-        const addBtn = document.querySelector(`#btn-${i}`);
-        addBtn.addEventListener("click", () => {
-          const rangeBtn = `<div class="quantity text-white d-flex justify-content-center">
-                <button class="border-0 px-2 add-cart dark rounded-start text-white" id='decrease-${i}'>-</button>
-                <div class="p-1 px-2 dark h-100" id='qty${i}' >1</div>
-                <button class="border-0 px-2 add-cart dark rounded-end text-white" id='increase-${i}'>+</button>
+
+
+    const item_resp = products().then(itemArr => {
+      document.addEventListener("click", (event) => {
+
+        const i = event.target.getAttribute("index-no");
+        const btn_type = event.target.getAttribute("btn-type");
+        if (i) {
+          if (btn_type == "add") {
+            const rangeBtn = `<div class="quantity text-white d-flex justify-content-center">
+                  <button class="border-0 px-2 add-cart dark rounded-start text-white" index-no="${i}" id='decrease-${i}'>-</button>
+                  <div class="p-1 px-2 dark h-100" id='qty${i}' >1</div>
+                  <button class="border-0 px-2 add-cart dark rounded-end text-white" index-no="${i}" id='increase-${i}'>+</button>
+              </div>`;
+            const btnType = document.querySelector(`#btn-type${i}`);
+            btnType.innerHTML = rangeBtn;
+            const cartItem = `<div class="row align-items-center">
+              <div class="p-1 col-8">${itemArr[i].Item_Name}</div>
+              <div class="p-1 col-2"><div class="w-100 text-center align-items-center">
+                <div class="quantity text-white d-flex justify-content-center">
+                    <button class="border-0 px-2 add-cart dark rounded-start text-white" index-no="${i}" id='decrease-cart-${i}'>-</button>
+                    <div class="p-1 px-2 dark h-100" id="qty-cart-${i}">1</div>
+                    <button class="border-0 px-2 add-cart dark rounded-end text-white" index-no="${i}" id='increase-cart-${i}'>+</button>
+                </div>
+              </div></div>
+              <div class="p-1 col-2"><div class="text-end" id="sub-total-${i}">₹${itemArr[i].Selling_Price}</div></div>  
             </div>`;
-          const btnType = document.querySelector(`#btn-type${i}`);
-          btnType.innerHTML = rangeBtn;
-          const cartItem = `<div class="row align-items-center">
-            <div class="p-1 col-8">${itemArr[i].Item_Name}</div>
-            <div class="p-1 col-2"><div class="w-100 text-center align-items-center">
-              <div class="quantity text-white d-flex justify-content-center">
-                  <button class="border-0 px-2 add-cart dark rounded-start text-white" id='decrease-cart-${i}'>-</button>
-                  <div class="p-1 px-2 dark h-100" id="qty-cart-${i}">1</div>
-                  <button class="border-0 px-2 add-cart dark rounded-end text-white" id='increase-cart-${i}'>+</button>
-              </div>
-            </div></div>
-            <div class="p-1 col-2"><div class="text-end" id="sub-total-${i}">₹${itemArr[i].Selling_Price}</div></div>  
-          </div>`;
-          const list_group = document.querySelector(".list-group");
-          list_group.classList.remove("d-none");
-          const list_item = document.createElement("li");
-          list_item.className = "list-group-item align-items-center";
-          list_item.innerHTML = cartItem;
-          list_group.appendChild(list_item);
-          itemQty(i, itemArr[i].Selling_Price);
-        })
-      }
-    }
+            const list_group = document.querySelector(".list-group");
+            list_group.classList.remove("d-none");
+            const list_item = document.createElement("li");
+            list_item.className = "list-group-item align-items-center";
+            list_item.id = `list-item-${i}`;
+            list_item.innerHTML = cartItem;
+            list_group.appendChild(list_item);
+          }
+          else {
+            const price = itemArr[i].Selling_Price;
+            const item_price = document.querySelector(`#sub-total-${i}`);
+            const crnt_qty = document.querySelector(`#qty${i}`);
+            const cart_qty = document.querySelector(`#qty-cart-${i}`);
+            if (crnt_qty) {
+              let qty = crnt_qty.textContent;
+              if (qty > 0) {
+                if (event.target.id == `increase-${i}` || event.target.id == `increase-cart-${i}`) {
+                  qty++;
+                  crnt_qty.textContent = qty;
+                  cart_qty.textContent = qty;
+                  item_price.textContent = qty * parseFloat(price);
+                }
+                else if (event.target.id == `decrease-${i}` || event.target.id == `decrease-cart-${i}`) {
+                  if (qty > 1) {
+                    qty--;
+                    crnt_qty.textContent = qty;
+                    cart_qty.textContent = qty;
+                    item_price.textContent = qty * parseFloat(price);
+                  }
+                  else {
+                    const item = document.querySelector(`#list-item-${i}`);
+                    item.remove();
+                    const btn = document.querySelector(`#btn-type${i}`);
+                    const new_btn = `<button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" index-no="${i}" id='btn-${i}'>Add</button>`;
+                    if (btn) {
+                      btn.innerHTML = new_btn;
+                    }
+                  }
 
-    //  Qty Adjuster
-    const itemQty = (i, price) => {
-      const item_price = document.querySelector(`#sub-total-${i}`);
-      const crnt_qty = document.querySelector(`#qty${i}`);
-      const cart_qty = document.querySelector(`#qty-cart-${i}`);
-      let qty =  crnt_qty.textContent?parseInt(crnt_qty.textContent):0 ;
+                }
+              }
+            }
+          }
+        }
 
-      document.addEventListener("click",(event)=>{
-        if(event.target.textContent== `+`){
-          qty ++;
-          crnt_qty.textContent = qty;
-          cart_qty.textContent = qty;
-          item_price.textContent = qty * parseFloat(price);
-        }
-        else if(event.target.textContent == `-`){
-          if(qty > 1){
-            qty --;
-          crnt_qty.textContent = qty;
-          cart_qty.textContent = qty;
-          item_price.textContent = qty * parseFloat(price);
-          }
-          else{
-          const item = document.getElementsByClassName("list-group-item")[i];
-          const btn = document.querySelector(`#btn-type${i}`);
-          const new_btn = `<button class="btn btn-secondary add-cart btn-sm shadow" id='btn-${i}'>Add</button>`;
-          if(btn){
-            btn.innerHTML = new_btn;
-          }
-          if(item)
-          {
-            item.remove();
-          }
-          }
-          
-        }
-        itemQty(i,price);
       })
-    }
+    });
+    //  Qty Adjuster
+
 
 
     // Search Bar
@@ -142,7 +147,6 @@ ZOHO.CREATOR.init()
           const text_value = element.textContent.toLowerCase();
           const product = document.querySelector(`#card-group${i}`);
           if (text_value.includes(search_value)) {
-
             product.classList.remove("d-none");
           }
           else {
