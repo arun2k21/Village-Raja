@@ -45,9 +45,10 @@ ZOHO.CREATOR.init()
                  </div>
                </div>
              </div>`;
-        const card_group = document.querySelector("#product-card");
-        card_group.innerHTML = card;
+        
       }
+      const card_group = document.querySelector("#product-card");
+        card_group.innerHTML = card;
       await getCategory();
       await addToCart(itemArr);
       await searchItem(itemArr);
@@ -90,59 +91,41 @@ ZOHO.CREATOR.init()
 
     //  Qty Adjuster
     const itemQty = (i, price) => {
-      const incr_btn = document.querySelector(`#increase-${i}`);
       const item_price = document.querySelector(`#sub-total-${i}`);
       const crnt_qty = document.querySelector(`#qty${i}`);
       const cart_qty = document.querySelector(`#qty-cart-${i}`);
-      let qty = parseInt(crnt_qty.textContent) ;
-      incr_btn.addEventListener("click", () => {
-        const b = qty +1;
-        crnt_qty.textContent = b;
-        cart_qty.textContent = b;
-        item_price.textContent = b * parseFloat(price);
-        itemQty(i, price);
-      })
-     
-      const incr_btn_cart = document.querySelector(`#increase-cart-${i}`);
-      incr_btn_cart.addEventListener("click", () => {
-        const b = qty +1;
-        crnt_qty.textContent = b;
-        cart_qty.textContent = b;
-        item_price.textContent = b * parseFloat(price);
-        itemQty(i, price);
-      })
+      let qty =  crnt_qty.textContent?parseInt(crnt_qty.textContent):0 ;
 
-        const dcrs_btn = document.querySelector(`#decrease-${i}`);
-        dcrs_btn.addEventListener("click",()=>{
-          if (qty > 0)
-          {
-          const c = qty -1;
-          crnt_qty.textContent = c;
-          cart_qty.textContent = c;
-          item_price.textContent = c * parseFloat(price);
+      document.addEventListener("click",(event)=>{
+        if(event.target.textContent== `+`){
+          qty ++;
+          crnt_qty.textContent = qty;
+          cart_qty.textContent = qty;
+          item_price.textContent = qty * parseFloat(price);
+        }
+        else if(event.target.textContent == `-`){
+          if(qty > 1){
+            qty --;
+          crnt_qty.textContent = qty;
+          cart_qty.textContent = qty;
+          item_price.textContent = qty * parseFloat(price);
           }
           else{
-            const btnType = document.querySelector(`#btn-type${i}`);
-            btnType.innerHTML = `<button class="btn btn-secondary add-cart btn-sm shadow" id='btn-${i}'>Add</button>`;
+          const item = document.getElementsByClassName("list-group-item")[i];
+          const btn = document.querySelector(`#btn-type${i}`);
+          const new_btn = `<button class="btn btn-secondary add-cart btn-sm shadow" id='btn-${i}'>Add</button>`;
+          if(btn){
+            btn.innerHTML = new_btn;
           }
-          itemQty(i, price);
-        });
-        const dcrs_cart_btn = document.querySelector(`#decrease-cart-${i}`);
-        dcrs_cart_btn.addEventListener("click",()=>{
-          if(qty > 1)
+          if(item)
           {
-            const d = qty -1;
-          crnt_qty.textContent = d;
-          cart_qty.textContent = d;
-          item_price.textContent = d * parseFloat(price);
+            item.remove();
           }
-          else{
-            const btnType = document.querySelector(`#btn-type${i}`);
-        btnType.innerHTML = `<button class="btn btn-secondary add-cart btn-sm shadow" id='btn-${i}'>Add</button>`;
           }
-          itemQty(i, price);
-        })
-      
+          
+        }
+        itemQty(i,price);
+      })
     }
 
 
