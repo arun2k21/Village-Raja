@@ -103,14 +103,16 @@ ZOHO.CREATOR.init()
                   qty++;
                   crnt_qty.textContent = qty;
                   cart_qty.textContent = qty;
-                  item_price.textContent = qty * parseFloat(price);
+                  const incr_total = qty * parseFloat(price);
+                  item_price.textContent = `₹ ${incr_total?incr_total:0.00}`;
                 }
                 else if (event.target.id == `decrease-${i}` || event.target.id == `decrease-cart-${i}`) {
                   if (qty > 1) {
                     qty--;
                     crnt_qty.textContent = qty;
                     cart_qty.textContent = qty;
-                    item_price.textContent = qty * parseFloat(price);
+                    const dcrs_total =  qty * parseFloat(price);
+                    item_price.textContent = `₹ ${dcrs_total?dcrs_total:0.00}`;
                   }
                   else {
                     const item = document.querySelector(`#list-item-${i}`);
@@ -126,12 +128,39 @@ ZOHO.CREATOR.init()
               }
             }
           }
+          total_amount();
         }
 
       })
     });
-    //  Qty Adjuster
 
+    const total_amount = ()=>{
+      const list_total = document.getElementsByClassName("list-group-item");
+      let x = 0;
+      let carts = 0;
+      for (let i = 0; i < list_total.length; i++) {
+        carts = carts + 1;
+        const sub_total = document.querySelector(`#sub-total-${i}`);
+        if(sub_total){
+          const total_amount = parseFloat(removeCurrencySymbol(sub_total.textContent));
+          x = x + total_amount;
+        }
+      }
+      const cart_badge = document.querySelector(".cart-badge");
+      cart_badge.classList.remove("d-none");
+      cart_badge.textContent = carts;
+      if(carts == 0){
+        cart_badge.classList.add("d-none");
+      }
+      const grand_total = document.querySelector("#grand-total");
+      grand_total.textContent = `₹ ${x}`;
+   }
+
+    const removeCurrencySymbol = (numberString) =>{
+      // Replace any non-digit characters with an empty string
+      return numberString.replace("₹", '');
+  }
+    
 
 
     // Search Bar

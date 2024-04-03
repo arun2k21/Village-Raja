@@ -41,9 +41,6 @@ width: 75px;
 .light{
     background: #feecff !important;
 }
-.badge{
-    padding: 3px 3px !important;
-}
 .btn{
     padding: 4px 15px !important;
 }
@@ -72,7 +69,7 @@ width: 75px;
     transition: 0.5s;
 }
 .cart-icon:hover{
-    transform: scale(1.2);
+    transform: scale(1.05);
     transition: 0.6s;
 }
 .add-cart:hover{
