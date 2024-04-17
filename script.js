@@ -1,23 +1,35 @@
 ZOHO.CREATOR.init()
   .then((data) => {
 
+    const createElementID = (item_id, type) => {
+      if (type == "increase button") {
+        return `vr_${item_id}_incrs`;
+      }
+      else if (type == "decrease button") {
+        return `vr_${item_id}__dcrs`;
+      }
+      else if (type == "item name") {
+        return `vr_${item_id}_item`;
+      }
+      else if (type == "cart group") {
+        return `vr_${item_id}_${area}`;
+      }
+    }
     const products = async (category) => {
       let filter = "Item_Name != null";
       config = {
         appName: "village-raja-order-management",
         reportName: "All_Products",
-        criteria: filter,
-        page: "1",
-        pageSize: "200"
+        criteria: filter
       }
-
 
       const productsArr = await ZOHO.CREATOR.API.getAllRecords(config);
       const itemArr = productsArr.data;
+
       let card = "";
       for (i = 0; i < itemArr.length; i++) {
         const product_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Products/${itemArr[i].ID}/Item_Image/download?privatelink=xUYDukHBOx3MP6td5erphGJ1ZBrqa8gypZTZTBrK8Kyjh8KxQzFvYrXzGpg8ADqtjGSdrTUqV1SuNX0JzdvAnbSgXTeYaKOSTXOE`;
-        card += `<div class="col-lg-6 col-md-6 col-12 mt-3" id='card-group${i}'>
+        card += `<div class="col-lg-6 col-md-6 col-12 mt-3 item-card main-${itemArr[i].ID}"  id='card-group${i}'>
                <div class="row">
                  <div class="col-12">
                    <div class="card food-card border-0 light">
@@ -26,6 +38,9 @@ ZOHO.CREATOR.init()
                          <div class="p-2 fw-bold item-name-0">
                            ${itemArr[i].Item_Name}
                          </div>
+                         <div class="p-2 fw-bold item-id d-none">
+                           ${itemArr[i].ID}
+                         </div>
                          <div class="fw-bold px-2">₹${itemArr[i].Selling_Price}</div>
                          <p class="description px-2 mt-2 overflow-y-scroll">
                            ${itemArr[i].Description}
@@ -33,8 +48,8 @@ ZOHO.CREATOR.init()
                        </div>
                        <div class="col-4">
                          <div class="card-body text-center"><img src="${product_img}" class="img-fluid rounded">
-                         <div class="w-100 text-center mt-2" id='btn-type${i}' >
-                         <button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" index-no="${i}" id='btn-${i}'>Add</button>
+                         <div class="w-100 text-center mt-2 btn-type" id='btn-type${i}' >
+                         <button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" item-id="${itemArr[i].ID}">Add</button>
                          </div>
                          <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock} in stock</small>
                          </div>
@@ -56,78 +71,105 @@ ZOHO.CREATOR.init()
 
     //  Add Item to cart
 
+    const range_btn = (item_id, i, qty) => {
+      return `<div class="quantity text-white d-flex justify-content-center">
+      <button class="border-0 px-2 add-cart dark rounded-start text-white dcrs-btn ${createElementID(item_id, "decrease button")}" item-id="${item_id}" id='decrease-${i}'>-</button>
+      <div class="p-1 px-2 dark h-100 qty" id='qty${i}' >${qty ? qty : 1}</div>
+      <button class="border-0 px-2 add-cart dark rounded-end text-white incrs-btn ${createElementID(item_id, "increase button")}" item-id="${item_id}" id='increase-${i}'>+</button>
+  </div>`;
+    }
+
+    const cart_item = (item_name, price, qty, item_id) => {
+      return `<div class="row align-items-center" id="cart-${item_id}">
+      <div class="p-1 col-6 item-name">${item_name}</div>
+      <div class="p-1 col-2"><div class="w-100 text-center align-items-center">
+        <div class="quantity text-white d-flex justify-content-center">
+            <button class="border-0 px-2 add-cart dark rounded-start text-white dcrs-btn ${createElementID(item_id, "decrease button")}" item-id="${item_id}">-</button>
+            <div class="p-1 px-2 dark h-100 qty">${qty}</div>
+            <button class="border-0 px-2 add-cart dark rounded-end text-white incrs-btn ${createElementID(item_id, "increase button")}" item-id="${item_id}">+</button>
+        </div>
+      </div></div>
+      <div class="p-1 col-4"><div class="text-end price" id="sub-total-${i}">₹${price}</div></div>  
+    </div>`;
+    }
 
     const item_resp = products().then(itemArr => {
       document.addEventListener("click", (event) => {
-          const i = event.target.getAttribute("index-no");
+        const target_item_id = event.target.getAttribute("item-id");
+        if (target_item_id) {
+          const target_item = itemArr.filter(item => item.ID == target_item_id);
+          const target_item_obj = target_item[0];
+          const incrs_btn_class = createElementID(target_item_id, "increase button");
+          const dcrs_btn_class = createElementID(target_item_id, "decrease button");
+          const target_class_list = Array.from(event.target.classList);
           const btn_type = event.target.getAttribute("btn-type");
-          if (i) {
-            if (btn_type == "add") {
-              const rangeBtn = `<div class="quantity text-white d-flex justify-content-center">
-                    <button class="border-0 px-2 add-cart dark rounded-start text-white" index-no="${i}" id='decrease-${i}'>-</button>
-                    <div class="p-1 px-2 dark h-100" id='qty${i}' >1</div>
-                    <button class="border-0 px-2 add-cart dark rounded-end text-white" index-no="${i}" id='increase-${i}'>+</button>
-                </div>`;
-              const btnType = document.querySelector(`#btn-type${i}`);
-              btnType.innerHTML = rangeBtn;
-              const cartItem = `<div class="row align-items-center">
-                <div class="p-1 col-8 item-name">${itemArr[i].Item_Name}</div>
-                <div class="p-1 col-2"><div class="w-100 text-center align-items-center">
-                  <div class="quantity text-white d-flex justify-content-center">
-                      <button class="border-0 px-2 add-cart dark rounded-start text-white" index-no="${i}" id='decrease-cart-${i}'>-</button>
-                      <div class="p-1 px-2 dark h-100 qty" id="qty-cart-${i}">1</div>
-                      <button class="border-0 px-2 add-cart dark rounded-end text-white" index-no="${i}" id='increase-cart-${i}'>+</button>
-                  </div>
-                </div></div>
-                <div class="p-1 col-2"><div class="text-end" id="sub-total-${i}">₹${itemArr[i].Selling_Price}</div></div>  
-              </div>`;
-              const list_group = document.querySelector(".list-group");
-              list_group.classList.remove("d-none");
-              const list_item = document.createElement("li");
-              list_item.className = "list-group-item align-items-center";
-              list_item.id = `list-item-${i}`;
-              list_item.innerHTML = cartItem;
-              list_group.appendChild(list_item);
+          if (btn_type == "add") {
+            const item_card = document.getElementsByClassName("item-card");
+            for (let j = 0; j < item_card.length; j++) {
+              const element = item_card[j];
+              const card_id = element.querySelector(".item-id");
+              const cardid = card_id.textContent.trim();
+              if (cardid == target_item_obj.ID) {
+                const btn_set = element.querySelector(".btn-type");
+                const button_range = range_btn(target_item_obj.ID, 0, target_item_obj.Quantity);
+                btn_set.innerHTML = button_range;
+                const cartItem = cart_item(target_item_obj.Item_Name, target_item_obj.Selling_Price,1, target_item_obj.ID);
+                const list_group = document.querySelector(".list-group");
+                list_group.classList.remove("d-none");
+                const list_item = document.createElement("li");
+                list_item.className = "list-group-item align-items-center";
+                list_item.innerHTML = cartItem;
+                list_group.appendChild(list_item);
+                break;
+              }
+
             }
-            else {
-              const price = itemArr[i].Selling_Price;
-              const item_price = document.querySelector(`#sub-total-${i}`);
-              const crnt_qty = document.querySelector(`#qty${i}`);
-              const cart_qty = document.querySelector(`#qty-cart-${i}`);
-              if (crnt_qty) {
-                let qty = crnt_qty.textContent;
-                if (qty > 0) {
-                  if (event.target.id == `increase-${i}` || event.target.id == `increase-cart-${i}`) {
-                    qty++;
-                    crnt_qty.textContent = qty;
-                    cart_qty.textContent = qty;
-                    const incr_total = qty * parseFloat(price);
-                    item_price.textContent = `₹ ${incr_total ? incr_total : 0.00}`;
-                  }
-                  else if (event.target.id == `decrease-${i}` || event.target.id == `decrease-cart-${i}`) {
-                    if (qty > 1) {
-                      qty--;
-                      crnt_qty.textContent = qty;
-                      cart_qty.textContent = qty;
-                      const dcrs_total = qty * parseFloat(price);
-                      item_price.textContent = `₹ ${dcrs_total ? dcrs_total : 0.00}`;
-                    }
-                    else {
-                      const item = document.querySelector(`#list-item-${i}`);
-                      item.remove();
-                      const btn = document.querySelector(`#btn-type${i}`);
-                      const new_btn = `<button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" index-no="${i}" id='btn-${i}'>Add</button>`;
-                      if (btn) {
-                        btn.innerHTML = new_btn;
-                      }
-                    }
-                  }
-                }
+
+          }
+          if (target_class_list.includes(incrs_btn_class) || target_class_list.includes(dcrs_btn_class)) {
+            
+            const cart_id = `cart-${target_item_obj.ID}`;
+            const listGroup = document.querySelector(".list-group");
+            const li_item = listGroup.querySelector(`#${cart_id}`);
+            const item_qty_obj = li_item.querySelector(".qty");
+            const main_id = `main-${target_item_obj.ID}`;
+            const mail_element = document.querySelector(`.${main_id}`);
+            const main_qty_element = mail_element.querySelector(".qty");
+            const main_qty = main_qty_element.textContent?parseInt(main_qty_element.textContent):0;
+            let item_qty = item_qty_obj.textContent?parseInt(item_qty_obj.textContent):0;
+            const price_element = li_item.querySelector(".price");
+            const price = target_item_obj.Price?parseFloat(target_item_obj.Price):0;
+            if(target_class_list.includes("incrs-btn")){
+              item_qty ++
+              item_qty_obj.textContent = item_qty;
+              main_qty_element.textContent = item_qty;
+              price_element.textContent = item_qty * price;
+            }
+            else if(target_class_list.includes("dcrs-btn")){
+              if(item_qty > 1)
+              {
+                item_qty -- 
+                item_qty_obj.textContent = item_qty;
+                main_qty_element.textContent = item_qty;
+                price_element.textContent = item_qty * price;
+              }
+              else{
+                const getCartElementID = `cart-${target_item_obj.ID}`;
+                const cart_element = document.querySelector(`#${getCartElementID}`);
+                const parent_element = cart_element.parentElement;
+                parent_element.remove();
+                const btn_type_element = mail_element.querySelector(".btn-type");
+                const new_btn = `<button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" item-id="${target_item_obj.ID}">Add</button>`;
+                btn_type_element.innerHTML = new_btn;
               }
             }
-             total_amount();
           }
-        
+           total_amount();
+           const save_icon = document.querySelector(`#save-icon`);
+           const save_cart = document.querySelector(`#save-cartbtn`);
+           save_cart.classList.remove("d-none");
+           save_icon.innerHTML = `<i class="bi bi-floppy2"></i>`;
+        }
 
       })
     });
@@ -160,6 +202,8 @@ ZOHO.CREATOR.init()
     }
 
     // Update Cart to ZOHO
+
+
 
     const postCart = async () => {
       const login_user = await ZOHO.CREATOR.UTIL.getInitParams();
@@ -195,9 +239,9 @@ ZOHO.CREATOR.init()
               const get_rec = await ZOHO.CREATOR.API.getAllRecords(config1);
               if (get_rec.code == 3000) {
                 const cart_obj = get_rec.data[0];
-               const updateConfig = {
+                const updateConfig = {
                   appName: "village-raja-order-management",
-                  reportName : "All_Item_Carts",
+                  reportName: "All_Item_Carts",
                   id: cart_obj.ID,
                   data: formData
                 }
@@ -220,14 +264,18 @@ ZOHO.CREATOR.init()
         }
       }
     }
+    const save_cart = document.querySelector(`#save-cartbtn`);
+    save_cart.addEventListener("click", (event) => {
+      postCart();
+    });
 
-    
 
     const updateListItems = async (rec_id, cart_list) => {
       for (let i = 0; i < cart_list.length; i++) {
         const element = cart_list[i];
         const item_name = document.getElementsByClassName("item-name")[i].textContent;
         const qty = document.getElementsByClassName("qty")[i].textContent;
+        const price = document.getElementsByClassName("price")[i].textContent;
         const item_id = await getitem_id(item_name);
         config = {
           appName: "village-raja-order-management",
@@ -239,9 +287,11 @@ ZOHO.CREATOR.init()
           "data": {
             "Item": item_id,
             "Quantity": qty,
+            "Price": price,
             "Item_Cart": rec_id
           }
         }
+
         try {
           const tot_records = await ZOHO.CREATOR.API.getAllRecords(config);
           if (tot_records.code == 3000) {
@@ -265,9 +315,11 @@ ZOHO.CREATOR.init()
           const add_rec = await ZOHO.CREATOR.API.addRecord(config_item);
         }
       }
+      const save_icon = document.querySelector(`#save-icon`);
+      save_icon.innerHTML = `<i class="bi bi-check-circle-fill"></i>`;
     }
 
-    const getCartFromZoho = async ()=>{
+    const getCartFromZoho = async () => {
       const login_user = await ZOHO.CREATOR.UTIL.getInitParams();
       const user_id = login_user.loginUser;
       const config = {
@@ -275,21 +327,78 @@ ZOHO.CREATOR.init()
         reportName: "Franchise_Report",
         criteria: `User_Email == "${user_id}"`,
       }
-      
-      try{
+      try {
         const franchise_response = await ZOHO.CREATOR.API.getAllRecords(config);
-        if(franchise_response.code == 3000){
+        if (franchise_response.code == 3000) {
           const franchise_obj = franchise_response.data[0];
-          if(franchise_obj){
-            
+          if (franchise_obj) {
+            cart_config = {
+              appName: "village-raja-order-management",
+              reportName: "All_Item_Carts",
+              criteria: `Branch_Name == ${franchise_obj.ID}`
+            }
+            try {
+              const cart_resp = await ZOHO.CREATOR.API.getAllRecords(cart_config);
+              if (cart_resp.code == 3000) {
+                const cart_obj = cart_resp.data[0];
+                if (cart_obj) {
+                  cart_list_config = {
+                    appName: "village-raja-order-management",
+                    reportName: "Item_Cart_Report",
+                    criteria: `Item_Cart == ${cart_obj.ID}`
+                  }
+                  try {
+                    const cart_list = await ZOHO.CREATOR.API.getAllRecords(cart_list_config);
+                    if (cart_list.code == 3000) {
+                      const cart_list_obj = cart_list.data;
+                      const list_group = document.querySelector(".list-group");
+                      list_group.classList.remove("d-none");
+                      cart_list_obj.forEach((cart, i) => {
+                        const cartItem = cart_item(cart.Item ? cart.Item.display_value : "", cart.Price ? cart.Price : 0, cart.Quantity, cart.Item.ID);
+                        const list_item = document.createElement("li");
+                        list_item.className = "list-group-item align-items-center";
+                        list_item.id = `list-item-${i}`;
+                        list_item.innerHTML = cartItem;
+                        list_group.appendChild(list_item);
+                        const item_card = document.getElementsByClassName("item-card");
+                        for (let j = 0; j < item_card.length; j++) {
+                          const element = item_card[j];
+                          const card_id = element.querySelector(".item-id");
+                          if (card_id) {
+                            const cardid = card_id.textContent;
+                            if (cardid.trim()) {
+                              if (cardid.trim() == cart.Item.ID) {
+                                const btn_type = element.querySelector(".btn-type");
+                                const rangeBtn = range_btn(cart.Item.ID, 0, cart.Quantity ? cart.Quantity : 1);
+                                btn_type.innerHTML = rangeBtn;
+                                break;
+                              }
+                            }
+                          }
+                        }
+                        total_amount()
+                      })
+                    }
+                  }
+                  catch (err) {
+                    console.log(err);
+                  }
+                }
+              }
+            }
+            catch (error) {
+              console.log(error)
+            }
+
           }
         }
       }
-      catch(error){
+      catch (error) {
         console.log(error);
       }
-      
+
     }
+    getCartFromZoho();
 
     const getitem_id = async (item_name) => {
       config = {
@@ -342,8 +451,8 @@ ZOHO.CREATOR.init()
         x = x + 1;
         const category_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Categories/${element.ID}/Image/download?privatelink=8YaUO6vz9USP1e6bGH6jQpfXspUmJTfNGp1GHzBtHPQ08qgYCDj1n2ezamVk8EKuD8t3DJz6KWZ0TaENKHhFSzwhqHsWOmUtN3fw`;
         cat_html += `<div class="text-center category cursor-pointer" id="cat-${x}">
-    <div class="cat rounded-circle"><img src="${element.Image?category_img:""}" alt="" height="75" width="75" class="rounded-circle"></div>
-    <div class="text-secondary fw-bold">${element.Category}</div>
+    <div class="cat rounded-circle"><img src="${element.Image ? category_img : ""}" alt="" height="75" width="75" class="rounded-circle"></div>
+    <div class="text-secondary fw-bold" style="font-size: 12px;">${element.Category}</div>
   </div>`;
       });
       const cat_group = document.querySelector("#all-category");
