@@ -14,7 +14,35 @@
     rel="stylesheet">
 </head>
 <body>
-  <div class="" style="height: 100vh; font-family: 'Montserrat', sans-serif;">
+  <div class="container" style="height: 100vh; font-family: 'Montserrat', sans-serif; background: #feecff;">
+    <div class="d-flex justify-content-center align-items-center">
+      <div class="card mt-3 border-0 shadow-sm">
+        <div class="card-header" style="background: #ca48bf;">
+          <div class="fs-4 fw-bold text-white text-center">Payment Details</div>
+        </div>
+        <div class="card-body">
+          <form class="row">
+            <div class="mb-3">
+              <label for="amount" class="form-label">Amount Payable</label>
+              <input type="number" class="form-control" value="0.0" id="amount" disabled readonly>
+            </div>
+            <div class="mb-3">
+              <label for="payment-date" class="form-label">Payment Date</label>
+              <input type="date" class="form-control" id="payment-date" required>
+            </div>
+            <div class="mb-3">
+              <label for="screenshot" class="form-label">Payment Screenshot</label>
+              <input type="file" class="form-control" id="screenshot" required>
+            </div>
+            <div class="col-12 mt-3">
+              <div class="text-center">
+                <button class="btn dark text-white" type="submit">Submit</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
     
   </div>
 
