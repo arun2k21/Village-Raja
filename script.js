@@ -1,6 +1,5 @@
 ZOHO.CREATOR.init()
   .then((data) => {
-
     const createElementID = (item_id, type) => {
       if (type == "increase button") {
         return `vr_${item_id}_incrs`;
@@ -22,10 +21,8 @@ ZOHO.CREATOR.init()
         reportName: "All_Products",
         criteria: filter
       }
-
       const productsArr = await ZOHO.CREATOR.API.getAllRecords(config);
       const itemArr = productsArr.data;
-
       let card = "";
       for (i = 0; i < itemArr.length; i++) {
         const product_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Products/${itemArr[i].ID}/Item_Image/download?privatelink=xUYDukHBOx3MP6td5erphGJ1ZBrqa8gypZTZTBrK8Kyjh8KxQzFvYrXzGpg8ADqtjGSdrTUqV1SuNX0JzdvAnbSgXTeYaKOSTXOE`;
@@ -81,7 +78,7 @@ ZOHO.CREATOR.init()
 
     const cart_item = (item_name, price, qty, item_id) => {
       return `<div class="row align-items-center" id="cart-${item_id}">
-      <div class="p-1 col-6 item-name">${item_name}</div>
+      <div class="p-1 col-6 item-name" item-id="${item_id}">${item_name}</div>
       <div class="p-1 col-2"><div class="w-100 text-center align-items-center">
         <div class="quantity text-white d-flex justify-content-center">
             <button class="border-0 px-2 add-cart dark rounded-start text-white dcrs-btn ${createElementID(item_id, "decrease button")}" item-id="${item_id}">-</button>
@@ -127,7 +124,6 @@ ZOHO.CREATOR.init()
 
           }
           if (target_class_list.includes(incrs_btn_class) || target_class_list.includes(dcrs_btn_class)) {
-
             const cart_id = `cart-${target_item_obj.ID}`;
             const listGroup = document.querySelector(".list-group");
             const li_item = listGroup.querySelector(`#${cart_id}`);
@@ -168,9 +164,7 @@ ZOHO.CREATOR.init()
           const save_cart = document.querySelector(`#save-cartbtn`);
           save_cart.classList.remove("d-none");
           save_icon.innerHTML = `<i class="bi bi-floppy2"></i>`;
-
         }
-
       })
     });
 
@@ -195,14 +189,11 @@ ZOHO.CREATOR.init()
       const grand_total = document.querySelector("#grand-total");
       grand_total.textContent = `₹ ${x}`;
     }
-
     const removeCurrencySymbol = (numberString) => {
       // Replace any non-digit characters with an empty string
       return numberString.replace("₹", '');
     }
-
     // Update Cart to ZOHO
-
     const getFranchiseDetails = async () => {
       const login_user = await ZOHO.CREATOR.UTIL.getInitParams();
       const user_id = login_user.loginUser;
@@ -267,7 +258,7 @@ ZOHO.CREATOR.init()
               const create_response = await ZOHO.CREATOR.API.addRecord(addRec);
               if (create_response.code == 3000) {
                 await updateListItems(create_response.data.ID, list_total);
-               
+
               }
             }
           }
@@ -290,7 +281,7 @@ ZOHO.CREATOR.init()
         const item_name = document.getElementsByClassName("item-name")[i].textContent;
         const qty = document.getElementsByClassName("qty")[i].textContent;
         const price_element = document.getElementsByClassName("price")[i];
-        const price_str = price_element?price_element.textContent:"";
+        const price_str = price_element ? price_element.textContent : "";
         const price = parseFloat(removeCurrencySymbol(price_str));
         const item_id = await getitem_id(item_name);
         config = {
@@ -332,18 +323,18 @@ ZOHO.CREATOR.init()
           const add_rec = await ZOHO.CREATOR.API.addRecord(config_item);
           promisses.push(add_rec);
         }
-       
+
       }
 
     }
-    const cartSavedIcon = ()=>{
+    const cartSavedIcon = () => {
       const save_icon = document.querySelector(`#save-icon`);
       save_icon.innerHTML = `<i class="bi bi-check-circle-fill"></i>`;
     }
 
-    const getCartID = async ()=>{
+    const getCartID = async () => {
       const franchise_resp = await getFranchiseDetails();
-      if(franchise_resp.code == 3000){
+      if (franchise_resp.code == 3000) {
         const config = {
           appName: "village-raja-order-management",
           reportName: "All_Item_Carts",
@@ -356,9 +347,9 @@ ZOHO.CREATOR.init()
     const deleteItemNotInCart = async () => {
       const franchise_resp = await getFranchiseDetails();
       if (franchise_resp.code == 3000) {
-        try{
+        try {
           const cart_obj = await getCartID();
-          if(cart_obj.code == 3000){
+          if (cart_obj.code == 3000) {
             const cart_id = cart_obj.data[0].ID;
             try {
               config = {
@@ -367,26 +358,26 @@ ZOHO.CREATOR.init()
                 criteria: `Item_Cart == ${cart_id}`
               }
               const records = await ZOHO.CREATOR.API.getAllRecords(config);
-              await dltAllItem(records,cart_id);
-              
+              await dltAllItem(records, cart_id);
+
             }
             catch (err) {
             }
           }
         }
-        catch(error){
+        catch (error) {
           console.log(error);
         }
-        
-      
-        
+
+
+
 
       }
     }
-    const dltAllItem = async (records,cart_id)=>{
+    const dltAllItem = async (records, cart_id) => {
       const resp = await records;
-      if(resp.code == 3000){
-        try{
+      if (resp.code == 3000) {
+        try {
           config = {
             appName: "village-raja-order-management",
             reportName: "Item_Cart_Report",
@@ -395,10 +386,10 @@ ZOHO.CREATOR.init()
           const dlt = await ZOHO.CREATOR.API.deleteRecord(config);
           console.log(dlt);
         }
-        catch(err){
+        catch (err) {
           console.log(err);
         }
-        
+
       }
     }
 
@@ -487,11 +478,6 @@ ZOHO.CREATOR.init()
       return rec_id.ID;
     }
 
-    
-
-
-
-
     // Search Bar
     const searchItem = (itemArr) => {
       const search = document.querySelector("#search-input");
@@ -537,5 +523,104 @@ ZOHO.CREATOR.init()
       cat_group.innerHTML = cat_html;
     }
 
+    const createOrderJSON = async () => {
+      const list_grourp = document.getElementsByClassName("list-group-item");
+      if (list_grourp) {
+        let API = [];
+        for (let i = 0; i < list_grourp.length; i++) {
+          const element = list_grourp[i];
+          const item_name = element.querySelector(".item-name").textContent;
+          const qty = element.querySelector(".qty").textContent;
+          const item_id_elemt = element.querySelector(".item-name");
+          const item_id = item_id_elemt.getAttribute("item-id");
+          const price = removeCurrencySymbol(element.querySelector(".price").textContent);
+          API.push(
+            {
+              "Item_ID": item_id,
+              "Item_Name": item_name,
+              "Qty": qty,
+              "Price": price
+            }
+          )
+        }
+        return API;
+      }
+      else {
+
+      }
+    }
+    document.addEventListener("click", (event) => {
+      if (event.target.id == "place-order") {
+        const order_details = createOrderJSON();
+        order_details.then(resp => {
+          localStorage.clear();
+          localStorage.setItem("Data1", JSON.stringify(resp));
+          hideShowContainers("two");
+          const total_amount = removeCurrencySymbol(document.querySelector("#grand-total").textContent);
+          document.querySelector("#amount").value = parseFloat(total_amount);
+          const currentDate = new Date().toISOString().split('T')[0];
+          const payment_date = document.querySelector("#payment-date");
+          payment_date.value = currentDate;
+        })
+      }
+      else if (event.target.id == "close-form") {
+        hideShowContainers("one");
+      }
+
+    })
+
+    const hideShowContainers = (container) => {
+      const container_one = document.querySelector(".container-one");
+      const container_two = document.querySelector(".container-two");
+      if (container == "one") {
+        container_one.classList.remove("d-none");
+        container_two.classList.add("d-none");
+      }
+      else if (container == "two") {
+        container_one.classList.add("d-none");
+        container_two.classList.remove("d-none");
+      }
+    }
+
+    const createOrder = async () => {
+      const itemArr_resp = localStorage.getItem("Data1");
+      const itemArr = JSON.parse(itemArr_resp);
+
+      config = {
+        appName: "village-raja-order-management",
+        formName: "Order"
+      }
+      const max_no = await createOrderID();
+      console.log(max_no);
+
+    }
+    const createOrderBtn = document.querySelector("#create-order");
+    createOrderBtn.addEventListener("click", () => {
+      createOrder();
+    })
+
+    const createOrderID = async () => {
+      config = {
+        appName: "village-raja-order-management",
+        reportName: "All_Order_Report"
+      }
+      try {
+        const order_resp = await ZOHO.CREATOR.API.getAllRecords(config);
+        if(order_resp.code == 3000){
+          const orderArr = order_resp.data;
+          const max_no = orderArr.reduce((acc,curr)=>{
+            if(curr.Auto_Number > acc){
+              acc = parseInt(curr.Auto_Number);
+            }
+            return acc;            
+          },0);
+          return max_no;
+        }
+        
+      }
+      catch (err) {
+        return 0;
+      }
+    }
     // ZC Ends
   });
