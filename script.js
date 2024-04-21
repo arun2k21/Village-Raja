@@ -168,7 +168,7 @@ ZOHO.CREATOR.init()
       })
     });
 
-    const total_amount = () => {
+    const getTotal = () =>{
       const list_total = document.getElementsByClassName("list-group-item");
       let x = 0;
       let carts = 0;
@@ -186,8 +186,15 @@ ZOHO.CREATOR.init()
       if (carts == 0) {
         cart_badge.classList.add("d-none");
       }
+      return x;
+
+    }
+
+    const total_amount = () => {
+      const total = getTotal();
+     
       const grand_total = document.querySelector("#grand-total");
-      grand_total.textContent = `₹ ${x}`;
+      grand_total.textContent = `₹ ${total}`;
     }
     const removeCurrencySymbol = (numberString) => {
       // Replace any non-digit characters with an empty string
@@ -549,12 +556,18 @@ ZOHO.CREATOR.init()
 
       }
     }
+
+    // Place Order
+
     document.addEventListener("click", (event) => {
       if (event.target.id == "place-order") {
         const order_details = createOrderJSON();
+        const total =  getTotal();
+        console.log(total);
         order_details.then(resp => {
           localStorage.clear();
           localStorage.setItem("Data1", JSON.stringify(resp));
+          localStorage.setItem("Total",total);
           hideShowContainers("two");
           const total_amount = removeCurrencySymbol(document.querySelector("#grand-total").textContent);
           document.querySelector("#amount").value = parseFloat(total_amount);
@@ -582,22 +595,51 @@ ZOHO.CREATOR.init()
       }
     }
 
-    const createOrder = async () => {
-      const itemArr_resp = localStorage.getItem("Data1");
-      const itemArr = JSON.parse(itemArr_resp);
-
-      config = {
-        appName: "village-raja-order-management",
-        formName: "Order"
-      }
-      const max_no = await createOrderID();
-      console.log(max_no);
-
-    }
     const createOrderBtn = document.querySelector("#create-order");
     createOrderBtn.addEventListener("click", () => {
       createOrder();
     })
+
+    const createOrder = async () => {
+      const itemArr_resp = localStorage.getItem("Data1");
+      const itemArr = JSON.parse(itemArr_resp);
+      const currentDate = new Date().toISOString().split('T')[0];
+      const branch_resp = await getFranchiseDetails();
+      const branch_id = branch_resp.data[0];
+      const tot_amnt = localStorage.getItem("Total");
+      
+      const order_id = await createOrderID();
+      formData ={
+        "data" : {
+          "Order_No" : order_id,
+          "Order_Date" : currentDate,
+          "Order_Status" : "Pending",
+          "Payment_Status" : "Pending",
+          "Branch_Name" : branch_id.ID,
+          "Total" : tot_amnt
+        }
+      }
+      config = {
+        appName: "village-raja-order-management",
+        formName: "Order",
+        data :formData
+      }
+      try{
+        const resp = await ZOHO.CREATOR.API.addRecord(config);
+        if(resp.code == 3000){
+         
+         await  createOrderListItems(resp);
+        }
+      }
+      catch(err){
+        console.log(err);
+      }
+      
+    }  
+
+    const createOrderListItems = (resp) =>{
+
+    }
 
     const createOrderID = async () => {
       config = {
@@ -606,17 +648,24 @@ ZOHO.CREATOR.init()
       }
       try {
         const order_resp = await ZOHO.CREATOR.API.getAllRecords(config);
-        if(order_resp.code == 3000){
+        if (order_resp.code == 3000) {
           const orderArr = order_resp.data;
-          const max_no = orderArr.reduce((acc,curr)=>{
-            if(curr.Auto_Number > acc){
+          const max_no = orderArr.reduce((acc, curr) => {
+            if (curr.Auto_Number > acc) {
               acc = parseInt(curr.Auto_Number);
             }
-            return acc;            
-          },0);
-          return max_no;
+            return acc;
+          }, 0);
+          const zeros = "0000";
+          const new_no = max_no + 1;
+          const max_len = new_no.toString();
+          const zero_len = zeros.length;
+          const rem_len = zero_len - max_len.length;
+          const rem_zeros = zeros.substring(0, rem_len);
+          const order_id = `VR-${rem_zeros + new_no}`;
+          return order_id;
         }
-        
+
       }
       catch (err) {
         return 0;
