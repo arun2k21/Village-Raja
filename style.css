@@ -63,6 +63,9 @@ width: 75px;
     font-size: 14px;
     font-weight: 500;
 }
+.no-stock{
+    font-size: 12px !important;
+}
 
 .navbar-brand:hover,.nav-link:hover{
     color: #ffd0fd !important;

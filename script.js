@@ -26,7 +26,7 @@ ZOHO.CREATOR.init()
       let card = "";
       for (i = 0; i < itemArr.length; i++) {
         const product_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Products/${itemArr[i].ID}/Item_Image/download?privatelink=xUYDukHBOx3MP6td5erphGJ1ZBrqa8gypZTZTBrK8Kyjh8KxQzFvYrXzGpg8ADqtjGSdrTUqV1SuNX0JzdvAnbSgXTeYaKOSTXOE`;
-        card += `<div class="col-lg-6 col-md-6 col-12 mt-3 item-card main-${itemArr[i].ID}"  id='card-group${i}'>
+        card += `<div class="col-lg-6 col-md-6 col-12 mt-3 item-card main-${itemArr[i].ID}" category='${itemArr[i].Category.display_value}'  id='card-group${i}'>
                <div class="row">
                  <div class="col-12">
                    <div class="card food-card border-0 light">
@@ -46,7 +46,7 @@ ZOHO.CREATOR.init()
                        <div class="col-4">
                          <div class="card-body text-center"><img src="${product_img}" class="img-fluid rounded">
                          <div class="w-100 text-center mt-2 btn-type" id='btn-type${i}' >
-                         <button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" item-id="${itemArr[i].ID}">Add</button>
+                         ${(itemArr[i].Available_Stock > 0) ? `<button class='btn btn-secondary add-cart btn-sm shadow' btn-type='add' item-id="${itemArr[i].ID}">Add</button>` : `${outOfStockBtn()}`}
                          </div>
                          <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock} in stock</small>
                          </div>
@@ -80,15 +80,16 @@ ZOHO.CREATOR.init()
       return `<div class="row align-items-center" id="cart-${item_id}">
       <div class="p-1 col-6 item-name" item-id="${item_id}">${item_name}</div>
       <div class="p-1 col-2"><div class="w-100 text-center align-items-center">
-        <div class="quantity text-white d-flex justify-content-center">
-            <button class="border-0 px-2 add-cart dark rounded-start text-white dcrs-btn ${createElementID(item_id, "decrease button")}" item-id="${item_id}">-</button>
-            <div class="p-1 px-2 dark h-100 qty">${qty}</div>
-            <button class="border-0 px-2 add-cart dark rounded-end text-white incrs-btn ${createElementID(item_id, "increase button")}" item-id="${item_id}">+</button>
-        </div>
+      ${range_btn(item_id, 0, qty)}
       </div></div>
       <div class="p-1 col-4"><div class="text-end price" id="sub-total-${i}">₹${price}</div></div>  
     </div>`;
     }
+
+    const outOfStockBtn = () => {
+      return `<button class="btn btn-light text-dark disabled no-stock">Out Of Stock</button>`;
+    }
+
 
     const item_resp = products().then(itemArr => {
       document.addEventListener("click", (event) => {
@@ -117,11 +118,10 @@ ZOHO.CREATOR.init()
                 list_item.className = "list-group-item align-items-center";
                 list_item.innerHTML = cartItem;
                 list_group.appendChild(list_item);
+                total_amount();
                 break;
               }
-
             }
-
           }
           if (target_class_list.includes(incrs_btn_class) || target_class_list.includes(dcrs_btn_class)) {
             const cart_id = `cart-${target_item_obj.ID}`;
@@ -131,22 +131,31 @@ ZOHO.CREATOR.init()
             const main_id = `main-${target_item_obj.ID}`;
             const mail_element = document.querySelector(`.${main_id}`);
             const main_qty_element = mail_element.querySelector(".qty");
-            const main_qty = main_qty_element.textContent ? parseInt(main_qty_element.textContent) : 0;
             let item_qty = item_qty_obj.textContent ? parseInt(item_qty_obj.textContent) : 0;
             const price_element = li_item.querySelector(".price");
             const price = target_item_obj.Selling_Price ? parseFloat(target_item_obj.Selling_Price) : 0;
             if (target_class_list.includes("incrs-btn")) {
-              item_qty++
-              item_qty_obj.textContent = item_qty;
-              main_qty_element.textContent = item_qty;
-              price_element.textContent = `₹ ${item_qty * price}`;
-            }
-            else if (target_class_list.includes("dcrs-btn")) {
-              if (item_qty > 1) {
-                item_qty--
+              const stock = target_item_obj.Available_Stock;
+              item_qty++;
+              if (item_qty <= stock) {
                 item_qty_obj.textContent = item_qty;
                 main_qty_element.textContent = item_qty;
                 price_element.textContent = `₹ ${item_qty * price}`;
+                if (stock == item_qty) {
+                  event.target.classList.add("disabled");
+                  event.target.setAttribute("data-bs-target", "#alert-lowstock");
+                  event.target.setAttribute("data-bs-toggle", "modal");
+                }
+                total_amount();
+              }
+            }
+            else if (target_class_list.includes("dcrs-btn")) {
+              if (item_qty > 1) {
+                item_qty--;
+                item_qty_obj.textContent = item_qty;
+                main_qty_element.textContent = item_qty;
+                price_element.textContent = `₹ ${item_qty * price}`;
+                total_amount();
               }
               else {
                 const getCartElementID = `cart-${target_item_obj.ID}`;
@@ -156,10 +165,11 @@ ZOHO.CREATOR.init()
                 const btn_type_element = mail_element.querySelector(".btn-type");
                 const new_btn = `<button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" item-id="${target_item_obj.ID}">Add</button>`;
                 btn_type_element.innerHTML = new_btn;
+                total_amount();
               }
             }
           }
-          total_amount();
+
           const save_icon = document.querySelector(`#save-icon`);
           const save_cart = document.querySelector(`#save-cartbtn`);
           save_cart.classList.remove("d-none");
@@ -291,6 +301,7 @@ ZOHO.CREATOR.init()
         const price_str = price_element ? price_element.textContent : "";
         const price = parseFloat(removeCurrencySymbol(price_str));
         const item_id = await getitem_id(item_name);
+
         config = {
           appName: "village-raja-order-management",
           reportName: "Item_Cart_Report",
@@ -516,9 +527,9 @@ ZOHO.CREATOR.init()
       cate_list.forEach(element => {
         x = x + 1;
         const category_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Categories/${element.ID}/Image/download?privatelink=8YaUO6vz9USP1e6bGH6jQpfXspUmJTfNGp1GHzBtHPQ08qgYCDj1n2ezamVk8EKuD8t3DJz6KWZ0TaENKHhFSzwhqHsWOmUtN3fw`;
-        cat_html += `<div class="text-center category cursor-pointer" id="cat-${x}">
-    <div class="cat rounded-circle"><img src="${element.Image ? category_img : ""}" alt="" height="75" width="75" class="rounded-circle"></div>
-    <div class="text-secondary fw-bold" style="font-size: 12px;">${element.Category}</div>
+        cat_html += `<div class="text-center category cat-btn cursor-pointer" id="cat-${x}">
+    <div class="cat rounded-circle cat-btn"><img src="${element.Image ? category_img : ""}" alt="" height="75" width="75" class="rounded-circle cat-btn"></div>
+    <div class="text-secondary fw-bold cat-btn" style="font-size: 12px;">${element.Category}</div>
   </div>`;
       });
       const cat_group = document.querySelector("#all-category");
@@ -556,20 +567,26 @@ ZOHO.CREATOR.init()
 
     document.addEventListener("click", (event) => {
       if (event.target.id == "place-order") {
-        const order_details = createOrderJSON();
-        const total = getTotal();
-        console.log(total);
-        order_details.then(resp => {
-          localStorage.clear();
-          localStorage.setItem("Data1", JSON.stringify(resp));
-          localStorage.setItem("Total", total);
-          hideShowContainers("two");
-          const total_amount = removeCurrencySymbol(document.querySelector("#grand-total").textContent);
-          document.querySelector("#amount").value = parseFloat(total_amount);
-          const currentDate = new Date().toISOString().split('T')[0];
-          const payment_date = document.querySelector("#payment-date");
-          payment_date.value = currentDate;
-        })
+        const list_groups = document.querySelectorAll(".list-group-item");
+        if (list_groups) {
+          if (list_groups.length > 0) {
+            const order_details = createOrderJSON();
+            const total = getTotal();
+            order_details.then(resp => {
+              localStorage.clear();
+              localStorage.setItem("Data1", JSON.stringify(resp));
+              localStorage.setItem("Total", total);
+              hideShowContainers("two");
+              const total_amount = removeCurrencySymbol(document.querySelector("#grand-total").textContent);
+              document.querySelector("#amount").value = parseFloat(total_amount);
+              const currentDate = new Date().toISOString().split('T')[0];
+              const payment_date = document.querySelector("#payment-date");
+              payment_date.value = currentDate;
+            })
+          }
+        }
+
+
       }
       else if (event.target.id == "close-form") {
         hideShowContainers("one");
@@ -592,7 +609,15 @@ ZOHO.CREATOR.init()
 
     const createOrderBtn = document.querySelector("#create-order");
     createOrderBtn.addEventListener("click", () => {
+    const screenshot = document.querySelector("#screenshot").files[0];
+    if(screenshot)
+    {
       createOrder();
+    }
+    else{
+      window.alert("Please upload the payment screenshot to create order");
+    }
+      
     })
 
     const createOrder = async () => {
@@ -621,6 +646,7 @@ ZOHO.CREATOR.init()
         const resp = await ZOHO.CREATOR.API.addRecord(config);
         if (resp.code == 3000) {
           await createOrderListItems(resp);
+          await updateScreenShot(resp.data.ID);
           await deleteItemNotInCart();
           window.alert(`Your Order No ${order_id} has been placed successfully`);
           window.location.reload();
@@ -630,6 +656,22 @@ ZOHO.CREATOR.init()
         console.log(err);
       }
 
+    }
+    const updateScreenShot = async (order_id)=>{
+      const image = document.querySelector("#screenshot").files[0];
+      const config = {
+        appName : "village-raja-order-management",
+        reportName : "All_Orders",
+        id : order_id,
+        fieldName : "Upload_Screenshot",
+        file : image
+      }
+      try{
+        const resp = await ZOHO.CREATOR.API.uploadFile(config);
+      }
+      catch(err){
+        console.log(err);
+      }
     }
 
     const getMonthStr = (mon) => {
@@ -649,43 +691,66 @@ ZOHO.CREATOR.init()
       try {
         const response = await resp;
         if (response.code == 3000) {
-          itemArr.forEach(async (item_obj,i) => {
+          itemArr.forEach(async (item_obj, i) => {
             i++;
-            try{
+            try {
               const getItemZoho = await getItemObj(item_obj.Item_ID);
-            formData = {
-              "data" : {
-              "Item" : item_obj.Item_ID,
-              "Quantity": item_obj.Qty,
-              "Price" : getItemZoho.Selling_Price,
-              "S_No" : i,
-              "Order_ID": response.data.ID,
-              "Category": getItemZoho.Category.ID
+              formData = {
+                "data": {
+                  "Item": item_obj.Item_ID,
+                  "Quantity": item_obj.Qty,
+                  "Price": getItemZoho.Selling_Price,
+                  "S_No": i,
+                  "Order_ID": response.data.ID,
+                  "Category": getItemZoho.Category.ID
+                }
+              }
+              config = {
+                appName: "village-raja-order-management",
+                formName: "Order_Item_SF",
+                data: formData
+              }
+              try {
+                await ZOHO.CREATOR.API.addRecord(config);
+                await updateStock(getItemZoho, item_obj.Qty);
+              }
+              catch (error) {
+                console.log(error);
               }
             }
-            config ={
-              appName : "village-raja-order-management",
-              formName : "Order_Item_SF",
-              data : formData 
-            }
-            try{
-              await ZOHO.CREATOR.API.addRecord(config); 
-            }
-            catch(error){
-              console.log(error);
-            }
-            }
-            catch(err){
+            catch (err) {
               console.log(err);
             }
-            
+
           })
         }
       }
       catch (err) {
         console.log(err);
       }
+    }
 
+    const updateStock = async (item_obj, qty) => {
+
+      const rem_stock = item_obj.Available_Stock - qty;
+      formData = {
+        "data": {
+          "Available_Stock": rem_stock
+        }
+      }
+      try {
+        config = {
+          appName: "village-raja-order-management",
+          reportName: "All_Products",
+          id: item_obj.ID,
+          data: formData
+        }
+        const resp = await ZOHO.CREATOR.API.updateRecord(config);
+        console.log(resp);
+      }
+      catch (err) {
+        console.log(err);
+      }
     }
 
     const createOrderID = async () => {
@@ -712,7 +777,6 @@ ZOHO.CREATOR.init()
           const order_id = `VR-${rem_zeros + new_no}`;
           return order_id;
         }
-
       }
       catch (err) {
         return 0;
@@ -725,15 +789,25 @@ ZOHO.CREATOR.init()
         reportName: "All_Products",
         criteria: `ID == ${ID}`
       }
-      try{
+      try {
         const rec_obj = await ZOHO.CREATOR.API.getAllRecords(config);
         const rec_id = rec_obj.data[0];
         return rec_id;
       }
-      catch(err){
+      catch (err) {
         return err;
       }
-      
     }
+
+    const categoryFilter = ()=>{
+console.log("Hi");
+    }
+    document.addEventListener("click",(event)=>{
+     const target_class_list = Array.from(event.target.classList);
+     if(target_class_list.includes("cat-btn")){
+      categoryFilter();
+     }
+    })
+
     // ZC Ends
   });
