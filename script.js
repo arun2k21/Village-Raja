@@ -168,7 +168,7 @@ ZOHO.CREATOR.init()
       })
     });
 
-    const getTotal = () =>{
+    const getTotal = () => {
       const list_total = document.getElementsByClassName("list-group-item");
       let x = 0;
       let carts = 0;
@@ -192,7 +192,7 @@ ZOHO.CREATOR.init()
 
     const total_amount = () => {
       const total = getTotal();
-     
+
       const grand_total = document.querySelector("#grand-total");
       grand_total.textContent = `₹ ${total}`;
     }
@@ -366,7 +366,6 @@ ZOHO.CREATOR.init()
               }
               const records = await ZOHO.CREATOR.API.getAllRecords(config);
               await dltAllItem(records, cart_id);
-
             }
             catch (err) {
             }
@@ -375,10 +374,6 @@ ZOHO.CREATOR.init()
         catch (error) {
           console.log(error);
         }
-
-
-
-
       }
     }
     const dltAllItem = async (records, cart_id) => {
@@ -562,12 +557,12 @@ ZOHO.CREATOR.init()
     document.addEventListener("click", (event) => {
       if (event.target.id == "place-order") {
         const order_details = createOrderJSON();
-        const total =  getTotal();
+        const total = getTotal();
         console.log(total);
         order_details.then(resp => {
           localStorage.clear();
           localStorage.setItem("Data1", JSON.stringify(resp));
-          localStorage.setItem("Total",total);
+          localStorage.setItem("Total", total);
           hideShowContainers("two");
           const total_amount = removeCurrencySymbol(document.querySelector("#grand-total").textContent);
           document.querySelector("#amount").value = parseFloat(total_amount);
@@ -601,43 +596,95 @@ ZOHO.CREATOR.init()
     })
 
     const createOrder = async () => {
-      const itemArr_resp = localStorage.getItem("Data1");
-      const itemArr = JSON.parse(itemArr_resp);
-      const currentDate = new Date().toISOString().split('T')[0];
+      const currentDate = zohoCurrentDate();
       const branch_resp = await getFranchiseDetails();
       const branch_id = branch_resp.data[0];
       const tot_amnt = localStorage.getItem("Total");
-      
+
       const order_id = await createOrderID();
-      formData ={
-        "data" : {
-          "Order_No" : order_id,
-          "Order_Date" : currentDate,
-          "Order_Status" : "Pending",
-          "Payment_Status" : "Pending",
-          "Branch_Name" : branch_id.ID,
-          "Total" : tot_amnt
+      formData = {
+        "data": {
+          "Order_No": order_id,
+          "Order_Date": currentDate,
+          "Order_Status": "Pending",
+          "Payment_Status": "Pending",
+          "Branch_Name": branch_id.ID,
+          "Total": tot_amnt
         }
       }
       config = {
         appName: "village-raja-order-management",
         formName: "Order",
-        data :formData
+        data: formData
       }
-      try{
+      try {
         const resp = await ZOHO.CREATOR.API.addRecord(config);
-        if(resp.code == 3000){
-         
-         await  createOrderListItems(resp);
+        if (resp.code == 3000) {
+          await createOrderListItems(resp);
+          await deleteItemNotInCart();
+          window.alert(`Your Order No ${order_id} has been placed successfully`);
+          window.location.reload();
         }
       }
-      catch(err){
+      catch (err) {
         console.log(err);
       }
-      
-    }  
 
-    const createOrderListItems = (resp) =>{
+    }
+
+    const getMonthStr = (mon) => {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return months[mon];
+    }
+
+    const zohoCurrentDate = () => {
+      const today_obj = new Date();
+      const date = `${today_obj.getDate()}-${getMonthStr(today_obj.getMonth())}-${today_obj.getFullYear()}`;
+      return date;
+    }
+
+    const createOrderListItems = async (resp) => {
+      const itemArr_resp = localStorage.getItem("Data1");
+      const itemArr = JSON.parse(itemArr_resp);
+      try {
+        const response = await resp;
+        if (response.code == 3000) {
+          itemArr.forEach(async (item_obj,i) => {
+            i++;
+            try{
+              const getItemZoho = await getItemObj(item_obj.Item_ID);
+            formData = {
+              "data" : {
+              "Item" : item_obj.Item_ID,
+              "Quantity": item_obj.Qty,
+              "Price" : getItemZoho.Selling_Price,
+              "S_No" : i,
+              "Order_ID": response.data.ID,
+              "Category": getItemZoho.Category.ID
+              }
+            }
+            config ={
+              appName : "village-raja-order-management",
+              formName : "Order_Item_SF",
+              data : formData 
+            }
+            try{
+              await ZOHO.CREATOR.API.addRecord(config); 
+            }
+            catch(error){
+              console.log(error);
+            }
+            }
+            catch(err){
+              console.log(err);
+            }
+            
+          })
+        }
+      }
+      catch (err) {
+        console.log(err);
+      }
 
     }
 
@@ -670,6 +717,23 @@ ZOHO.CREATOR.init()
       catch (err) {
         return 0;
       }
+    }
+
+    const getItemObj = async (ID) => {
+      config = {
+        appName: "village-raja-order-management",
+        reportName: "All_Products",
+        criteria: `ID == ${ID}`
+      }
+      try{
+        const rec_obj = await ZOHO.CREATOR.API.getAllRecords(config);
+        const rec_id = rec_obj.data[0];
+        return rec_id;
+      }
+      catch(err){
+        return err;
+      }
+      
     }
     // ZC Ends
   });
