@@ -522,14 +522,17 @@ ZOHO.CREATOR.init()
       }
       const category_response = await ZOHO.CREATOR.API.getAllRecords(config);
       const cate_list = category_response.data;
-      let cat_html = ``;
+      let cat_html = `<div class="text-center category cursor-pointer">
+      <div class="cat rounded-circle"><img src="" height="75" width="75" class="rounded-circle" id="all-cat"></div>
+      <div class="text-secondary fw-bold" style="font-size: 12px;">All</div>
+    </div>`;
       let x = 0;
       cate_list.forEach(element => {
         x = x + 1;
         const category_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Categories/${element.ID}/Image/download?privatelink=8YaUO6vz9USP1e6bGH6jQpfXspUmJTfNGp1GHzBtHPQ08qgYCDj1n2ezamVk8EKuD8t3DJz6KWZ0TaENKHhFSzwhqHsWOmUtN3fw`;
-        cat_html += `<div class="text-center category cat-btn cursor-pointer" id="cat-${x}">
-    <div class="cat rounded-circle cat-btn"><img src="${element.Image ? category_img : ""}" alt="" height="75" width="75" class="rounded-circle cat-btn"></div>
-    <div class="text-secondary fw-bold cat-btn" style="font-size: 12px;">${element.Category}</div>
+        cat_html += `<div class="text-center category cursor-pointer" id="cat-${x}">
+    <div class="cat rounded-circle"><img src="${element.Image ? category_img : ""}" category="${element.Category}" height="75" width="75" class="rounded-circle cat-btn"></div>
+    <div class="text-secondary fw-bold" style="font-size: 12px;">${element.Category}</div>
   </div>`;
       });
       const cat_group = document.querySelector("#all-category");
@@ -799,13 +802,30 @@ ZOHO.CREATOR.init()
       }
     }
 
-    const categoryFilter = ()=>{
-console.log("Hi");
-    }
+  
     document.addEventListener("click",(event)=>{
      const target_class_list = Array.from(event.target.classList);
      if(target_class_list.includes("cat-btn")){
-      categoryFilter();
+      const category_name = event.target.getAttribute("category");
+      const item_cards = document.querySelectorAll(".item-card");
+      for (let i = 0; i < item_cards.length; i++) {
+        const element = item_cards[i];
+        const item_cat = element.getAttribute("category");
+        if(item_cat == category_name){
+          element.classList.remove("d-none");
+        }
+        else{
+          element.classList.add("d-none");
+        }
+      }
+     }
+     else if(event.target.id == "all-cat"){
+      const item_cards = document.querySelectorAll(".item-card");
+      for (let i = 0; i < item_cards.length; i++) {
+        const element = item_cards[i];
+          element.classList.remove("d-none");
+        
+      }
      }
     })
 
