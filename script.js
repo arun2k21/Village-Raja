@@ -14,15 +14,14 @@ ZOHO.CREATOR.init()
         return `vr_${item_id}_${area}`;
       }
     }
-    const products = async (category) => {
-      let filter = "Item_Name != null";
+    const products = async () => {
       config = {
         appName: "village-raja-order-management",
-        reportName: "All_Products",
-        criteria: filter
+        reportName: "All_Products"
       }
       const productsArr = await ZOHO.CREATOR.API.getAllRecords(config);
       const itemArr = productsArr.data;
+       document.querySelector("#api1").textContent = productsArr.code;
       let card = "";
       for (i = 0; i < itemArr.length; i++) {
         const product_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Products/${itemArr[i].ID}/Item_Image/download?privatelink=xUYDukHBOx3MP6td5erphGJ1ZBrqa8gypZTZTBrK8Kyjh8KxQzFvYrXzGpg8ADqtjGSdrTUqV1SuNX0JzdvAnbSgXTeYaKOSTXOE`;
@@ -61,7 +60,7 @@ ZOHO.CREATOR.init()
       const card_group = document.querySelector("#product-card");
       card_group.innerHTML = card;
       await getCategory();
-      await searchItem(itemArr);
+      searchItem(itemArr);
       return itemArr;
     }
 
@@ -91,7 +90,7 @@ ZOHO.CREATOR.init()
     }
 
 
-    const item_resp = products().then(itemArr => {
+    products().then(itemArr => {
       document.addEventListener("click", (event) => {
         const target_item_id = event.target.getAttribute("item-id");
         if (target_item_id) {
@@ -409,6 +408,7 @@ ZOHO.CREATOR.init()
     const getCartFromZoho = async () => {
       try {
         const franchise_response = await getFranchiseDetails();
+        document.querySelector("#api2").textContent = franchise_response.code;
         if (franchise_response.code == 3000) {
           const franchise_obj = franchise_response.data[0];
           if (franchise_obj) {
@@ -460,8 +460,7 @@ ZOHO.CREATOR.init()
                       })
                     }
                   }
-                  catch (err) {
-                    console.log(err);
+                  catch {
                   }
                 }
               }
@@ -520,6 +519,7 @@ ZOHO.CREATOR.init()
         appName: "village-raja-order-management",
         reportName: "All_Categories",
       }
+      try{
       const category_response = await ZOHO.CREATOR.API.getAllRecords(config);
       const cate_list = category_response.data;
       let cat_html = `<div class="text-center category cursor-pointer">
@@ -537,6 +537,10 @@ ZOHO.CREATOR.init()
       });
       const cat_group = document.querySelector("#all-category");
       cat_group.innerHTML = cat_html;
+    }
+    catch(err){
+
+    }
     }
 
     const createOrderJSON = async () => {
