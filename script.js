@@ -59,7 +59,7 @@ ZOHO.CREATOR.init()
       }
       const card_group = document.querySelector("#product-card");
       card_group.innerHTML = card;
-      await getCategory();
+      // await getCategory();
       searchItem(itemArr);
       return itemArr;
     }
