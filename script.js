@@ -90,92 +90,92 @@ ZOHO.CREATOR.init()
     }
 
     products();
-    products().then(itemArr => {
-      document.addEventListener("click", (event) => {
-        const target_item_id = event.target.getAttribute("item-id");
-        if (target_item_id) {
-          const target_item = itemArr.filter(item => item.ID == target_item_id);
-          const target_item_obj = target_item[0];
-          const incrs_btn_class = createElementID(target_item_id, "increase button");
-          const dcrs_btn_class = createElementID(target_item_id, "decrease button");
-          const target_class_list = Array.from(event.target.classList);
-          const btn_type = event.target.getAttribute("btn-type");
-          if (btn_type == "add") {
-            const item_card = document.getElementsByClassName("item-card");
-            for (let j = 0; j < item_card.length; j++) {
-              const element = item_card[j];
-              const card_id = element.querySelector(".item-id");
-              const cardid = card_id.textContent.trim();
-              if (cardid == target_item_obj.ID) {
-                const btn_set = element.querySelector(".btn-type");
-                const button_range = range_btn(target_item_obj.ID, 0, target_item_obj.Quantity);
-                btn_set.innerHTML = button_range;
-                const cartItem = cart_item(target_item_obj.Item_Name, target_item_obj.Selling_Price, 1, target_item_obj.ID);
-                const list_group = document.querySelector(".list-group");
-                list_group.classList.remove("d-none");
-                const list_item = document.createElement("li");
-                list_item.className = "list-group-item align-items-center";
-                list_item.innerHTML = cartItem;
-                list_group.appendChild(list_item);
-                total_amount();
-                break;
-              }
-            }
-          }
-          if (target_class_list.includes(incrs_btn_class) || target_class_list.includes(dcrs_btn_class)) {
-            const cart_id = `cart-${target_item_obj.ID}`;
-            const listGroup = document.querySelector(".list-group");
-            const li_item = listGroup.querySelector(`#${cart_id}`);
-            const item_qty_obj = li_item.querySelector(".qty");
-            const main_id = `main-${target_item_obj.ID}`;
-            const mail_element = document.querySelector(`.${main_id}`);
-            const main_qty_element = mail_element.querySelector(".qty");
-            let item_qty = item_qty_obj.textContent ? parseInt(item_qty_obj.textContent) : 0;
-            const price_element = li_item.querySelector(".price");
-            const price = target_item_obj.Selling_Price ? parseFloat(target_item_obj.Selling_Price) : 0;
-            if (target_class_list.includes("incrs-btn")) {
-              const stock = target_item_obj.Available_Stock;
-              item_qty++;
-              if (item_qty <= stock) {
-                item_qty_obj.textContent = item_qty;
-                main_qty_element.textContent = item_qty;
-                price_element.textContent = `₹ ${item_qty * price}`;
-                if (stock == item_qty) {
-                  event.target.classList.add("disabled");
-                  event.target.setAttribute("data-bs-target", "#alert-lowstock");
-                  event.target.setAttribute("data-bs-toggle", "modal");
-                }
-                total_amount();
-              }
-            }
-            else if (target_class_list.includes("dcrs-btn")) {
-              if (item_qty > 1) {
-                item_qty--;
-                item_qty_obj.textContent = item_qty;
-                main_qty_element.textContent = item_qty;
-                price_element.textContent = `₹ ${item_qty * price}`;
-                total_amount();
-              }
-              else {
-                const getCartElementID = `cart-${target_item_obj.ID}`;
-                const cart_element = document.querySelector(`#${getCartElementID}`);
-                const parent_element = cart_element.parentElement;
-                parent_element.remove();
-                const btn_type_element = mail_element.querySelector(".btn-type");
-                const new_btn = `<button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" item-id="${target_item_obj.ID}">Add</button>`;
-                btn_type_element.innerHTML = new_btn;
-                total_amount();
-              }
-            }
-          }
+    // products().then(itemArr => {
+    //   document.addEventListener("click", (event) => {
+    //     const target_item_id = event.target.getAttribute("item-id");
+    //     if (target_item_id) {
+    //       const target_item = itemArr.filter(item => item.ID == target_item_id);
+    //       const target_item_obj = target_item[0];
+    //       const incrs_btn_class = createElementID(target_item_id, "increase button");
+    //       const dcrs_btn_class = createElementID(target_item_id, "decrease button");
+    //       const target_class_list = Array.from(event.target.classList);
+    //       const btn_type = event.target.getAttribute("btn-type");
+    //       if (btn_type == "add") {
+    //         const item_card = document.getElementsByClassName("item-card");
+    //         for (let j = 0; j < item_card.length; j++) {
+    //           const element = item_card[j];
+    //           const card_id = element.querySelector(".item-id");
+    //           const cardid = card_id.textContent.trim();
+    //           if (cardid == target_item_obj.ID) {
+    //             const btn_set = element.querySelector(".btn-type");
+    //             const button_range = range_btn(target_item_obj.ID, 0, target_item_obj.Quantity);
+    //             btn_set.innerHTML = button_range;
+    //             const cartItem = cart_item(target_item_obj.Item_Name, target_item_obj.Selling_Price, 1, target_item_obj.ID);
+    //             const list_group = document.querySelector(".list-group");
+    //             list_group.classList.remove("d-none");
+    //             const list_item = document.createElement("li");
+    //             list_item.className = "list-group-item align-items-center";
+    //             list_item.innerHTML = cartItem;
+    //             list_group.appendChild(list_item);
+    //             total_amount();
+    //             break;
+    //           }
+    //         }
+    //       }
+    //       if (target_class_list.includes(incrs_btn_class) || target_class_list.includes(dcrs_btn_class)) {
+    //         const cart_id = `cart-${target_item_obj.ID}`;
+    //         const listGroup = document.querySelector(".list-group");
+    //         const li_item = listGroup.querySelector(`#${cart_id}`);
+    //         const item_qty_obj = li_item.querySelector(".qty");
+    //         const main_id = `main-${target_item_obj.ID}`;
+    //         const mail_element = document.querySelector(`.${main_id}`);
+    //         const main_qty_element = mail_element.querySelector(".qty");
+    //         let item_qty = item_qty_obj.textContent ? parseInt(item_qty_obj.textContent) : 0;
+    //         const price_element = li_item.querySelector(".price");
+    //         const price = target_item_obj.Selling_Price ? parseFloat(target_item_obj.Selling_Price) : 0;
+    //         if (target_class_list.includes("incrs-btn")) {
+    //           const stock = target_item_obj.Available_Stock;
+    //           item_qty++;
+    //           if (item_qty <= stock) {
+    //             item_qty_obj.textContent = item_qty;
+    //             main_qty_element.textContent = item_qty;
+    //             price_element.textContent = `₹ ${item_qty * price}`;
+    //             if (stock == item_qty) {
+    //               event.target.classList.add("disabled");
+    //               event.target.setAttribute("data-bs-target", "#alert-lowstock");
+    //               event.target.setAttribute("data-bs-toggle", "modal");
+    //             }
+    //             total_amount();
+    //           }
+    //         }
+    //         else if (target_class_list.includes("dcrs-btn")) {
+    //           if (item_qty > 1) {
+    //             item_qty--;
+    //             item_qty_obj.textContent = item_qty;
+    //             main_qty_element.textContent = item_qty;
+    //             price_element.textContent = `₹ ${item_qty * price}`;
+    //             total_amount();
+    //           }
+    //           else {
+    //             const getCartElementID = `cart-${target_item_obj.ID}`;
+    //             const cart_element = document.querySelector(`#${getCartElementID}`);
+    //             const parent_element = cart_element.parentElement;
+    //             parent_element.remove();
+    //             const btn_type_element = mail_element.querySelector(".btn-type");
+    //             const new_btn = `<button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" item-id="${target_item_obj.ID}">Add</button>`;
+    //             btn_type_element.innerHTML = new_btn;
+    //             total_amount();
+    //           }
+    //         }
+    //       }
 
-          const save_icon = document.querySelector(`#save-icon`);
-          const save_cart = document.querySelector(`#save-cartbtn`);
-          save_cart.classList.remove("d-none");
-          save_icon.innerHTML = `<i class="bi bi-floppy2"></i>`;
-        }
-      })
-    });
+    //       const save_icon = document.querySelector(`#save-icon`);
+    //       const save_cart = document.querySelector(`#save-cartbtn`);
+    //       save_cart.classList.remove("d-none");
+    //       save_icon.innerHTML = `<i class="bi bi-floppy2"></i>`;
+    //     }
+    //   })
+    // });
 
     const getTotal = () => {
       const list_total = document.getElementsByClassName("list-group-item");
@@ -196,7 +196,6 @@ ZOHO.CREATOR.init()
         cart_badge.classList.add("d-none");
       }
       return x;
-
     }
 
     const total_amount = () => {
