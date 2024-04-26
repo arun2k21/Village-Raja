@@ -475,7 +475,7 @@ ZOHO.CREATOR.init()
       }
 
     }
-    getCartFromZoho();
+    // getCartFromZoho();
 
     const getitem_id = async (item_name) => {
       config = {
