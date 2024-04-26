@@ -89,7 +89,7 @@ ZOHO.CREATOR.init()
       return `<button class="btn btn-light text-dark disabled no-stock">Out Of Stock</button>`;
     }
 
-
+    products();
     products().then(itemArr => {
       document.addEventListener("click", (event) => {
         const target_item_id = event.target.getAttribute("item-id");
@@ -408,7 +408,6 @@ ZOHO.CREATOR.init()
     const getCartFromZoho = async () => {
       try {
         const franchise_response = await getFranchiseDetails();
-        document.querySelector("#api2").textContent = franchise_response.code;
         if (franchise_response.code == 3000) {
           const franchise_obj = franchise_response.data[0];
           if (franchise_obj) {
