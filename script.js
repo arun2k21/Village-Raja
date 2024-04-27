@@ -122,7 +122,7 @@ ZOHO.CREATOR.init()
 
       }
       const card_group = document.querySelector("#product-card");
-     card_group.innerHTML = await card;
+     card_group.innerHTML = card;
      
       return await itemArr;
     }
@@ -134,14 +134,15 @@ ZOHO.CREATOR.init()
     //  Add Item to cart
 
     const executeOrder = async () => {
-      await products();
+      const itemArr = await products();
       await getCartFromZoho();
       await getCategory();
       searchItem(itemArr);
+      return itemArr;
     }
-    executeOrder();
 
-    products().then(itemArr => {
+    const itemArrObj = executeOrder();
+    itemArrObj.then(itemArr => {
       document.addEventListener("click", (event) => {
         const target_item_id = event.target.getAttribute("item-id");
         if (target_item_id) {
@@ -226,7 +227,8 @@ ZOHO.CREATOR.init()
           save_icon.innerHTML = `<i class="bi bi-floppy2"></i>`;
         }
       })
-    });
+    })
+     
 
     
     const postCart = async () => {
