@@ -76,7 +76,7 @@
         <div class="main-card bg-white border-0 h-100">
           <div class="container-fluid p-2">
             <div class="justify-content-center d-flex">
-              <div class="d-flex p-2 gap-4 overflow-x-auto rounded" id="all-category">
+              <div class="d-flex p-2 gap-4 overflow-x-auto rounded justify-content-center w-90" id="all-category">
                 <!-- JS Data -->
               </div>
             </div>
@@ -131,8 +131,20 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="order-created" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body">
+            This product is currently out of stock. We're working to restock it as soon as possible.
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-dismiss="modal" id="close-order">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
     crossorigin="anonymous"></script>

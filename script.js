@@ -533,7 +533,7 @@ ZOHO.CREATOR.init()
       const category_response = await ZOHO.CREATOR.API.getAllRecords(config);
       const cate_list = category_response.data;
       let cat_html = `<div class="text-center category cursor-pointer">
-      <div class="cat rounded-circle"><img src="" height="75" width="75" class="rounded-circle" id="all-cat"></div>
+      <div class="cat rounded-circle"><img src="serviceorg-normal.png" height="75" width="75" class="rounded-circle" id="all-cat"></div>
       <div class="text-secondary fw-bold" style="font-size: 12px;">All</div>
     </div>`;
       let x = 0;
@@ -575,9 +575,6 @@ ZOHO.CREATOR.init()
         }
         return API;
       }
-      else {
-
-      }
     }
 
     // Place Order
@@ -602,7 +599,6 @@ ZOHO.CREATOR.init()
             })
           }
         }
-
 
       }
       else if (event.target.id == "close-form") {
@@ -642,7 +638,6 @@ ZOHO.CREATOR.init()
       const branch_resp = await getFranchiseDetails();
       const branch_id = branch_resp.data[0];
       const tot_amnt = localStorage.getItem("Total");
-
       const order_id = await createOrderID();
       formData = {
         "data": {
@@ -665,15 +660,25 @@ ZOHO.CREATOR.init()
           await createOrderListItems(resp);
           await updateScreenShot(resp.data.ID);
           await deleteItemNotInCart();
-          window.alert(`Your Order No ${order_id} has been placed successfully`);
-          window.location.reload();
+          await orderSucccessALert(order_id);
         }
       }
       catch (err) {
         console.log(err);
       }
-
     }
+
+    const orderSucccessALert = (order_id) => {
+      const alert_msg = `Your Order No ${order_id} has been placed successfully`;
+      const modalElement = document.querySelector("#order-created");
+      modalElement.querySelector(".modal-body").textContent = alert_msg;
+      $('#order-created').modal('show');
+    }
+    document.querySelector("#close-order").addEventListener("click",()=>{
+      location.reload();
+    })
+
+
     const updateScreenShot = async (order_id)=>{
       const image = document.querySelector("#screenshot").files[0];
       const config = {
@@ -762,8 +767,7 @@ ZOHO.CREATOR.init()
           id: item_obj.ID,
           data: formData
         }
-        const resp = await ZOHO.CREATOR.API.updateRecord(config);
-        console.log(resp);
+         await ZOHO.CREATOR.API.updateRecord(config);
       }
       catch (err) {
         console.log(err);
@@ -842,6 +846,8 @@ ZOHO.CREATOR.init()
       }
      }
     })
+
+
 
     // ZC Ends
   });
