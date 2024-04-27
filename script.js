@@ -14,168 +14,6 @@ ZOHO.CREATOR.init()
         return `vr_${item_id}_${area}`;
       }
     }
-    const products = async () => {
-      config = {
-        appName: "village-raja-order-management",
-        reportName: "All_Products"
-      }
-      const productsArr = await ZOHO.CREATOR.API.getAllRecords(config);
-      const itemArr = productsArr.data;
-       document.querySelector("#api1").textContent = productsArr.code;
-      let card = "";
-      for (i = 0; i < itemArr.length; i++) {
-        const product_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Products/${itemArr[i].ID}/Item_Image/download?privatelink=xUYDukHBOx3MP6td5erphGJ1ZBrqa8gypZTZTBrK8Kyjh8KxQzFvYrXzGpg8ADqtjGSdrTUqV1SuNX0JzdvAnbSgXTeYaKOSTXOE`;
-        card += `<div class="col-lg-6 col-md-6 col-12 mt-3 item-card main-${itemArr[i].ID}" category='${itemArr[i].Category.display_value}'  id='card-group${i}'>
-               <div class="row">
-                 <div class="col-12">
-                   <div class="card food-card border-0 light">
-                     <div class="row">
-                       <div class="col-8">
-                         <div class="p-2 fw-bold item-name-0">
-                           ${itemArr[i].Item_Name}
-                         </div>
-                         <div class="p-2 fw-bold item-id d-none">
-                           ${itemArr[i].ID}
-                         </div>
-                         <div class="fw-bold px-2">₹${itemArr[i].Selling_Price}</div>
-                         <p class="description px-2 mt-2 overflow-y-scroll">
-                           ${itemArr[i].Description}
-                         </p>
-                       </div>
-                       <div class="col-4">
-                         <div class="card-body text-center"><img src="${product_img}" class="img-fluid rounded">
-                         <div class="w-100 text-center mt-2 btn-type" id='btn-type${i}' >
-                         ${(itemArr[i].Available_Stock > 0) ? `<button class='btn btn-secondary add-cart btn-sm shadow' btn-type='add' item-id="${itemArr[i].ID}">Add</button>` : `${outOfStockBtn()}`}
-                         </div>
-                         <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock} in stock</small>
-                         </div>
-                       </div>
-                     </div> 
-                   </div>
-                 </div>
-               </div>
-             </div>`;
-
-      }
-      const card_group = document.querySelector("#product-card");
-      card_group.innerHTML = card;
-      // await getCategory();
-      searchItem(itemArr);
-      return itemArr;
-    }
-
-
-    //  Add Item to cart
-
-    const range_btn = (item_id, i, qty) => {
-      return `<div class="quantity text-white d-flex justify-content-center">
-      <button class="border-0 px-2 add-cart dark rounded-start text-white dcrs-btn ${createElementID(item_id, "decrease button")}" item-id="${item_id}" id='decrease-${i}'>-</button>
-      <div class="p-1 px-2 dark h-100 qty" id='qty${i}' >${qty ? qty : 1}</div>
-      <button class="border-0 px-2 add-cart dark rounded-end text-white incrs-btn ${createElementID(item_id, "increase button")}" item-id="${item_id}" id='increase-${i}'>+</button>
-  </div>`;
-    }
-
-    const cart_item = (item_name, price, qty, item_id) => {
-      return `<div class="row align-items-center" id="cart-${item_id}">
-      <div class="p-1 col-6 item-name" item-id="${item_id}">${item_name}</div>
-      <div class="p-1 col-2"><div class="w-100 text-center align-items-center">
-      ${range_btn(item_id, 0, qty)}
-      </div></div>
-      <div class="p-1 col-4"><div class="text-end price" id="sub-total-${i}">₹${price}</div></div>  
-    </div>`;
-    }
-
-    const outOfStockBtn = () => {
-      return `<button class="btn btn-light text-dark disabled no-stock">Out Of Stock</button>`;
-    }
-
-    products();
-    // products().then(itemArr => {
-    //   document.addEventListener("click", (event) => {
-    //     const target_item_id = event.target.getAttribute("item-id");
-    //     if (target_item_id) {
-    //       const target_item = itemArr.filter(item => item.ID == target_item_id);
-    //       const target_item_obj = target_item[0];
-    //       const incrs_btn_class = createElementID(target_item_id, "increase button");
-    //       const dcrs_btn_class = createElementID(target_item_id, "decrease button");
-    //       const target_class_list = Array.from(event.target.classList);
-    //       const btn_type = event.target.getAttribute("btn-type");
-    //       if (btn_type == "add") {
-    //         const item_card = document.getElementsByClassName("item-card");
-    //         for (let j = 0; j < item_card.length; j++) {
-    //           const element = item_card[j];
-    //           const card_id = element.querySelector(".item-id");
-    //           const cardid = card_id.textContent.trim();
-    //           if (cardid == target_item_obj.ID) {
-    //             const btn_set = element.querySelector(".btn-type");
-    //             const button_range = range_btn(target_item_obj.ID, 0, target_item_obj.Quantity);
-    //             btn_set.innerHTML = button_range;
-    //             const cartItem = cart_item(target_item_obj.Item_Name, target_item_obj.Selling_Price, 1, target_item_obj.ID);
-    //             const list_group = document.querySelector(".list-group");
-    //             list_group.classList.remove("d-none");
-    //             const list_item = document.createElement("li");
-    //             list_item.className = "list-group-item align-items-center";
-    //             list_item.innerHTML = cartItem;
-    //             list_group.appendChild(list_item);
-    //             total_amount();
-    //             break;
-    //           }
-    //         }
-    //       }
-    //       if (target_class_list.includes(incrs_btn_class) || target_class_list.includes(dcrs_btn_class)) {
-    //         const cart_id = `cart-${target_item_obj.ID}`;
-    //         const listGroup = document.querySelector(".list-group");
-    //         const li_item = listGroup.querySelector(`#${cart_id}`);
-    //         const item_qty_obj = li_item.querySelector(".qty");
-    //         const main_id = `main-${target_item_obj.ID}`;
-    //         const mail_element = document.querySelector(`.${main_id}`);
-    //         const main_qty_element = mail_element.querySelector(".qty");
-    //         let item_qty = item_qty_obj.textContent ? parseInt(item_qty_obj.textContent) : 0;
-    //         const price_element = li_item.querySelector(".price");
-    //         const price = target_item_obj.Selling_Price ? parseFloat(target_item_obj.Selling_Price) : 0;
-    //         if (target_class_list.includes("incrs-btn")) {
-    //           const stock = target_item_obj.Available_Stock;
-    //           item_qty++;
-    //           if (item_qty <= stock) {
-    //             item_qty_obj.textContent = item_qty;
-    //             main_qty_element.textContent = item_qty;
-    //             price_element.textContent = `₹ ${item_qty * price}`;
-    //             if (stock == item_qty) {
-    //               event.target.classList.add("disabled");
-    //               event.target.setAttribute("data-bs-target", "#alert-lowstock");
-    //               event.target.setAttribute("data-bs-toggle", "modal");
-    //             }
-    //             total_amount();
-    //           }
-    //         }
-    //         else if (target_class_list.includes("dcrs-btn")) {
-    //           if (item_qty > 1) {
-    //             item_qty--;
-    //             item_qty_obj.textContent = item_qty;
-    //             main_qty_element.textContent = item_qty;
-    //             price_element.textContent = `₹ ${item_qty * price}`;
-    //             total_amount();
-    //           }
-    //           else {
-    //             const getCartElementID = `cart-${target_item_obj.ID}`;
-    //             const cart_element = document.querySelector(`#${getCartElementID}`);
-    //             const parent_element = cart_element.parentElement;
-    //             parent_element.remove();
-    //             const btn_type_element = mail_element.querySelector(".btn-type");
-    //             const new_btn = `<button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" item-id="${target_item_obj.ID}">Add</button>`;
-    //             btn_type_element.innerHTML = new_btn;
-    //             total_amount();
-    //           }
-    //         }
-    //       }
-
-    //       const save_icon = document.querySelector(`#save-icon`);
-    //       const save_cart = document.querySelector(`#save-cartbtn`);
-    //       save_cart.classList.remove("d-none");
-    //       save_icon.innerHTML = `<i class="bi bi-floppy2"></i>`;
-    //     }
-    //   })
-    // });
 
     const getTotal = () => {
       const list_total = document.getElementsByClassName("list-group-item");
@@ -220,6 +58,172 @@ ZOHO.CREATOR.init()
       return await ZOHO.CREATOR.API.getAllRecords(config);
     }
 
+
+    const range_btn = (item_id, i, qty) => {
+      return `<div class="quantity text-white d-flex justify-content-center">
+      <button class="border-0 px-2 add-cart dark rounded-start text-white dcrs-btn ${createElementID(item_id, "decrease button")}" item-id="${item_id}" id='decrease-${i}'>-</button>
+      <div class="p-1 px-2 dark h-100 qty" id='qty${i}' >${qty ? qty : 1}</div>
+      <button class="border-0 px-2 add-cart dark rounded-end text-white incrs-btn ${createElementID(item_id, "increase button")}" item-id="${item_id}" id='increase-${i}'>+</button>
+  </div>`;
+    }
+
+    const cart_item = (item_name, price, qty, item_id) => {
+      return `<div class="row align-items-center" id="cart-${item_id}">
+      <div class="p-1 col-6 item-name" item-id="${item_id}">${item_name}</div>
+      <div class="p-1 col-2"><div class="w-100 text-center align-items-center">
+      ${range_btn(item_id, 0, qty)}
+      </div></div>
+      <div class="p-1 col-4"><div class="text-end price" id="sub-total-${i}">₹${price}</div></div>  
+    </div>`;
+    }
+
+    const products = async () => {
+      config = {
+        appName: "village-raja-order-management",
+        reportName: "All_Products"
+      }
+      try{
+      const productsArr = await ZOHO.CREATOR.API.getAllRecords(config);
+      const itemArr = productsArr.data;
+      let card = "";
+      for (i = 0; i < itemArr.length; i++) {
+        const product_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Products/${itemArr[i].ID}/Item_Image/download?privatelink=xUYDukHBOx3MP6td5erphGJ1ZBrqa8gypZTZTBrK8Kyjh8KxQzFvYrXzGpg8ADqtjGSdrTUqV1SuNX0JzdvAnbSgXTeYaKOSTXOE`;
+        card += `<div class="col-lg-6 col-md-6 col-12 mt-3 item-card main-${itemArr[i].ID}" category='${itemArr[i].Category.display_value}'  id='card-group${i}'>
+               <div class="row">
+                 <div class="col-12">
+                   <div class="card food-card border-0 light">
+                     <div class="row">
+                       <div class="col-8">
+                         <div class="p-2 fw-bold item-name-0">
+                           ${itemArr[i].Item_Name}
+                         </div>
+                         <div class="p-2 fw-bold item-id d-none">
+                           ${itemArr[i].ID}
+                         </div>
+                         <div class="fw-bold px-2">₹${itemArr[i].Selling_Price}</div>
+                         <p class="description px-2 mt-2 overflow-y-scroll">
+                           ${itemArr[i].Description}
+                         </p>
+                       </div>
+                       <div class="col-4">
+                         <div class="card-body text-center"><img src="${product_img}" class="img-fluid rounded">
+                         <div class="w-100 text-center mt-2 btn-type" id='btn-type${i}' >
+                         ${(itemArr[i].Available_Stock > 0) ? `<button class='btn btn-secondary add-cart btn-sm shadow' btn-type='add' item-id="${itemArr[i].ID}">Add</button>` : `${outOfStockBtn()}`}
+                         </div>
+                         <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock} in stock</small>
+                         </div>
+                       </div>
+                     </div> 
+                   </div>
+                 </div>
+               </div>
+             </div>`;
+             
+
+      }
+      const card_group = document.querySelector("#product-card");
+      card_group.innerHTML = card;
+      await getCartFromZoho();
+      await getCategory();
+      searchItem(itemArr);
+      return itemArr;
+    }
+    catch(err){
+      console.log(err);
+    }
+    }
+
+    //  Add Item to cart
+
+    products();
+    products().then(itemArr => {
+      document.addEventListener("click", (event) => {
+        const target_item_id = event.target.getAttribute("item-id");
+        if (target_item_id) {
+          const target_item = itemArr.filter(item => item.ID == target_item_id);
+          const target_item_obj = target_item[0];
+          const incrs_btn_class = createElementID(target_item_id, "increase button");
+          const dcrs_btn_class = createElementID(target_item_id, "decrease button");
+          const target_class_list = Array.from(event.target.classList);
+          const btn_type = event.target.getAttribute("btn-type");
+          if (btn_type == "add") {
+            const item_card = document.getElementsByClassName("item-card");
+            for (let j = 0; j < item_card.length; j++) {
+              const element = item_card[j];
+              const card_id = element.querySelector(".item-id");
+              const cardid = card_id.textContent.trim();
+              if (cardid == target_item_obj.ID) {
+                const btn_set = element.querySelector(".btn-type");
+                const button_range = range_btn(target_item_obj.ID, 0, target_item_obj.Quantity);
+                btn_set.innerHTML = button_range;
+                const cartItem = cart_item(target_item_obj.Item_Name, target_item_obj.Selling_Price, 1, target_item_obj.ID);
+                const list_group = document.querySelector(".list-group");
+                list_group.classList.remove("d-none");
+                const list_item = document.createElement("li");
+                list_item.className = "list-group-item align-items-center";
+                list_item.innerHTML = cartItem;
+                list_group.appendChild(list_item);
+                total_amount();
+                break;
+              }
+            }
+          }
+          if (target_class_list.includes(incrs_btn_class) || target_class_list.includes(dcrs_btn_class)) {
+            const cart_id = `cart-${target_item_obj.ID}`;
+            const listGroup = document.querySelector(".list-group");
+            const li_item = listGroup.querySelector(`#${cart_id}`);
+            const item_qty_obj = li_item.querySelector(".qty");
+            const main_id = `main-${target_item_obj.ID}`;
+            const mail_element = document.querySelector(`.${main_id}`);
+            const main_qty_element = mail_element.querySelector(".qty");
+            let item_qty = item_qty_obj.textContent ? parseInt(item_qty_obj.textContent) : 0;
+            const price_element = li_item.querySelector(".price");
+            const price = target_item_obj.Selling_Price ? parseFloat(target_item_obj.Selling_Price) : 0;
+            if (target_class_list.includes("incrs-btn")) {
+              const stock = target_item_obj.Available_Stock;
+              item_qty++;
+              if (item_qty <= stock) {
+                item_qty_obj.textContent = item_qty;
+                main_qty_element.textContent = item_qty;
+                price_element.textContent = `₹ ${item_qty * price}`;
+                if (stock == item_qty) {
+                  event.target.classList.add("disabled");
+                  event.target.setAttribute("data-bs-target", "#alert-lowstock");
+                  event.target.setAttribute("data-bs-toggle", "modal");
+                }
+                total_amount();
+              }
+            }
+            else if (target_class_list.includes("dcrs-btn")) {
+              if (item_qty > 1) {
+                item_qty--;
+                item_qty_obj.textContent = item_qty;
+                main_qty_element.textContent = item_qty;
+                price_element.textContent = `₹ ${item_qty * price}`;
+                total_amount();
+              }
+              else {
+                const getCartElementID = `cart-${target_item_obj.ID}`;
+                const cart_element = document.querySelector(`#${getCartElementID}`);
+                const parent_element = cart_element.parentElement;
+                parent_element.remove();
+                const btn_type_element = mail_element.querySelector(".btn-type");
+                const new_btn = `<button class="btn btn-secondary add-cart btn-sm shadow" btn-type="add" item-id="${target_item_obj.ID}">Add</button>`;
+                btn_type_element.innerHTML = new_btn;
+                total_amount();
+              }
+            }
+          }
+
+          const save_icon = document.querySelector(`#save-icon`);
+          const save_cart = document.querySelector(`#save-cartbtn`);
+          save_cart.classList.remove("d-none");
+          save_icon.innerHTML = `<i class="bi bi-floppy2"></i>`;
+        }
+      })
+    });
+
+    
     const postCart = async () => {
       const login_user = await ZOHO.CREATOR.UTIL.getInitParams();
       const user_id = login_user.loginUser;
@@ -343,6 +347,7 @@ ZOHO.CREATOR.init()
       }
 
     }
+
     const cartSavedIcon = () => {
       const save_icon = document.querySelector(`#save-icon`);
       save_icon.innerHTML = `<i class="bi bi-check-circle-fill"></i>`;
@@ -475,7 +480,7 @@ ZOHO.CREATOR.init()
       }
 
     }
-    // getCartFromZoho();
+    
 
     const getitem_id = async (item_name) => {
       config = {
@@ -510,7 +515,7 @@ ZOHO.CREATOR.init()
       })
     }
 
-    // Category Filter
+  //   // Category Filter
 
     const getCategory = async () => {
       config = {
