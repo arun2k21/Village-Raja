@@ -123,9 +123,7 @@ ZOHO.CREATOR.init()
       }
       const card_group = document.querySelector("#product-card");
      card_group.innerHTML = await card;
-      await getCartFromZoho();
-      await getCategory();
-      searchItem(itemArr);
+     
       return await itemArr;
     }
     catch(err){
@@ -135,7 +133,14 @@ ZOHO.CREATOR.init()
 
     //  Add Item to cart
 
-    products();
+    const executeOrder = async () => {
+      await products();
+      await getCartFromZoho();
+      await getCategory();
+      searchItem(itemArr);
+    }
+    executeOrder();
+
     products().then(itemArr => {
       document.addEventListener("click", (event) => {
         const target_item_id = event.target.getAttribute("item-id");
