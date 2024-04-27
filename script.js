@@ -122,11 +122,11 @@ ZOHO.CREATOR.init()
 
       }
       const card_group = document.querySelector("#product-card");
-      card_group.innerHTML = card;
+     card_group.innerHTML = await card;
       await getCartFromZoho();
       await getCategory();
       searchItem(itemArr);
-      return itemArr;
+      return await itemArr;
     }
     catch(err){
       console.log(err);
