@@ -82,13 +82,13 @@ ZOHO.CREATOR.init()
         appName: "village-raja-order-management",
         reportName: "All_Products"
       }
-      try{
-      const productsArr = await ZOHO.CREATOR.API.getAllRecords(config);
-      const itemArr = productsArr.data;
-      let card = "";
-      for (i = 0; i < itemArr.length; i++) {
-        const product_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Products/${itemArr[i].ID}/Item_Image/download?privatelink=xUYDukHBOx3MP6td5erphGJ1ZBrqa8gypZTZTBrK8Kyjh8KxQzFvYrXzGpg8ADqtjGSdrTUqV1SuNX0JzdvAnbSgXTeYaKOSTXOE`;
-        card += `<div class="col-lg-6 col-md-6 col-12 mt-3 item-card main-${itemArr[i].ID}" category='${itemArr[i].Category.display_value}'  id='card-group${i}'>
+      try {
+        const productsArr = await ZOHO.CREATOR.API.getAllRecords(config);
+        const itemArr = productsArr.data;
+        let card = "";
+        for (i = 0; i < itemArr.length; i++) {
+          const product_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Products/${itemArr[i].ID}/Item_Image/download?privatelink=xUYDukHBOx3MP6td5erphGJ1ZBrqa8gypZTZTBrK8Kyjh8KxQzFvYrXzGpg8ADqtjGSdrTUqV1SuNX0JzdvAnbSgXTeYaKOSTXOE`;
+          card += `<div class="col-lg-6 col-md-6 col-12 mt-3 item-card main-${itemArr[i].ID}" category='${itemArr[i].Category.display_value}'  id='card-group${i}'>
                <div class="row">
                  <div class="col-12">
                    <div class="card food-card border-0 light">
@@ -118,17 +118,17 @@ ZOHO.CREATOR.init()
                  </div>
                </div>
              </div>`;
-             
 
+
+        }
+        const card_group = document.querySelector("#product-card");
+        card_group.innerHTML = card;
+
+        return await itemArr;
       }
-      const card_group = document.querySelector("#product-card");
-     card_group.innerHTML = card;
-     
-      return await itemArr;
-    }
-    catch(err){
-      console.log(err);
-    }
+      catch (err) {
+        console.log(err);
+      }
     }
 
     //  Add Item to cart
@@ -228,9 +228,9 @@ ZOHO.CREATOR.init()
         }
       })
     })
-     
 
-    
+
+
     const postCart = async () => {
       const login_user = await ZOHO.CREATOR.UTIL.getInitParams();
       const user_id = login_user.loginUser;
@@ -296,7 +296,6 @@ ZOHO.CREATOR.init()
     const save_cart = document.querySelector(`#save-cartbtn`);
     save_cart.addEventListener("click", (event) => {
       postCart();
-
     });
 
 
@@ -397,6 +396,7 @@ ZOHO.CREATOR.init()
         }
       }
     }
+
     const dltAllItem = async (records, cart_id) => {
       const resp = await records;
       if (resp.code == 3000) {
@@ -487,7 +487,7 @@ ZOHO.CREATOR.init()
       }
 
     }
-    
+
 
     const getitem_id = async (item_name) => {
       config = {
@@ -522,35 +522,35 @@ ZOHO.CREATOR.init()
       })
     }
 
-  //   // Category Filter
+    //   // Category Filter
 
     const getCategory = async () => {
       config = {
         appName: "village-raja-order-management",
         reportName: "All_Categories",
       }
-      try{
-      const category_response = await ZOHO.CREATOR.API.getAllRecords(config);
-      const cate_list = category_response.data;
-      let cat_html = `<div class="text-center category cursor-pointer">
+      try {
+        const category_response = await ZOHO.CREATOR.API.getAllRecords(config);
+        const cate_list = category_response.data;
+        let cat_html = `<div class="text-center category cursor-pointer">
       <div class="cat rounded-circle"><img src="serviceorg-normal.png" height="75" width="75" class="rounded-circle" id="all-cat"></div>
       <div class="text-secondary fw-bold" style="font-size: 12px;">All</div>
     </div>`;
-      let x = 0;
-      cate_list.forEach(element => {
-        x = x + 1;
-        const category_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Categories/${element.ID}/Image/download?privatelink=8YaUO6vz9USP1e6bGH6jQpfXspUmJTfNGp1GHzBtHPQ08qgYCDj1n2ezamVk8EKuD8t3DJz6KWZ0TaENKHhFSzwhqHsWOmUtN3fw`;
-        cat_html += `<div class="text-center category cursor-pointer" id="cat-${x}">
+        let x = 0;
+        cate_list.forEach(element => {
+          x = x + 1;
+          const category_img = `https://creator.zoho.in/publishapi/v2/info_nkcfoods/village-raja-order-management/report/All_Categories/${element.ID}/Image/download?privatelink=8YaUO6vz9USP1e6bGH6jQpfXspUmJTfNGp1GHzBtHPQ08qgYCDj1n2ezamVk8EKuD8t3DJz6KWZ0TaENKHhFSzwhqHsWOmUtN3fw`;
+          cat_html += `<div class="text-center category cursor-pointer" id="cat-${x}">
     <div class="cat rounded-circle"><img src="${element.Image ? category_img : ""}" category="${element.Category}" height="75" width="75" class="rounded-circle cat-btn"></div>
     <div class="text-secondary fw-bold" style="font-size: 12px;">${element.Category}</div>
   </div>`;
-      });
-      const cat_group = document.querySelector("#all-category");
-      cat_group.innerHTML = cat_html;
-    }
-    catch(err){
+        });
+        const cat_group = document.querySelector("#all-category");
+        cat_group.innerHTML = cat_html;
+      }
+      catch (err) {
 
-    }
+      }
     }
 
     const createOrderJSON = async () => {
@@ -621,32 +621,57 @@ ZOHO.CREATOR.init()
     }
 
     const createOrderBtn = document.querySelector("#create-order");
-    createOrderBtn.addEventListener("click", () => {
-    const screenshot = document.querySelector("#screenshot").files[0];
-    if(screenshot)
-    {
-      createOrder();
-    }
-    else{
-      window.alert("Please upload the payment screenshot to create order");
-    }
-      
+    createOrderBtn.addEventListener("click", async () => {
+      const screenshot = document.querySelector("#screenshot").files[0];
+      if (screenshot) {
+       const order_obj = await createOrder("Paid");
+        await updateScreenShot(order_obj.record_id);
+        await orderSucccessALert(order_obj.order_id);
+      }
+      else {
+        window.alert("Please upload the payment screenshot to create order");
+      }
+
     })
 
-    const createOrder = async () => {
+    const sendNotification = async (order_id) => {
+      formData = {
+        "data": {
+          "Send_Notification": "true"
+        }
+      }
+      config = {
+        appName: "village-raja-order-management",
+        reportName: "All_Order_Report",
+        id: order_id,
+        data : formData
+      }
+      try{
+      await ZOHO.CREATOR.API.updateRecord(config);
+      }
+      catch(err){
+        console.log(err);
+      }
+
+    }
+
+    const createOrder = async (status) => {
       const currentDate = zohoCurrentDate();
       const branch_resp = await getFranchiseDetails();
       const branch_id = branch_resp.data[0];
       const tot_amnt = localStorage.getItem("Total");
       const order_id = await createOrderID();
+      const inv_no = await createInvoiceNo();
       formData = {
         "data": {
           "Order_No": order_id,
           "Order_Date": currentDate,
           "Order_Status": "Pending",
-          "Payment_Status": "Pending",
+          "Payment_Status": status,
           "Branch_Name": branch_id.ID,
-          "Total": tot_amnt
+          "Total": tot_amnt,
+          "Invoice_No": inv_no.inv_no,
+          "Inv_No": inv_no.max_no
         }
       }
       config = {
@@ -656,11 +681,15 @@ ZOHO.CREATOR.init()
       }
       try {
         const resp = await ZOHO.CREATOR.API.addRecord(config);
+        console.log(resp.data.ID);
         if (resp.code == 3000) {
           await createOrderListItems(resp);
-          await updateScreenShot(resp.data.ID);
           await deleteItemNotInCart();
-          await orderSucccessALert(order_id);
+          await sendNotification(resp.data.ID);
+          return {
+            "record_id" : resp.data.ID,
+            "order_id" : order_id
+          }
         }
       }
       catch (err) {
@@ -674,24 +703,25 @@ ZOHO.CREATOR.init()
       modalElement.querySelector(".modal-body").textContent = alert_msg;
       $('#order-created').modal('show');
     }
-    document.querySelector("#close-order").addEventListener("click",()=>{
+
+    document.querySelector("#close-order").addEventListener("click", () => {
       location.reload();
     })
 
 
-    const updateScreenShot = async (order_id)=>{
+    const updateScreenShot = async (order_id) => {
       const image = document.querySelector("#screenshot").files[0];
       const config = {
-        appName : "village-raja-order-management",
-        reportName : "All_Orders",
-        id : order_id,
-        fieldName : "Upload_Screenshot",
-        file : image
+        appName: "village-raja-order-management",
+        reportName: "All_Orders",
+        id: order_id,
+        fieldName: "Upload_Screenshot",
+        file: image
       }
-      try{
+      try {
         const resp = await ZOHO.CREATOR.API.uploadFile(config);
       }
-      catch(err){
+      catch (err) {
         console.log(err);
       }
     }
@@ -753,7 +783,6 @@ ZOHO.CREATOR.init()
     }
 
     const updateStock = async (item_obj, qty) => {
-
       const rem_stock = item_obj.Available_Stock - qty;
       formData = {
         "data": {
@@ -767,7 +796,7 @@ ZOHO.CREATOR.init()
           id: item_obj.ID,
           data: formData
         }
-         await ZOHO.CREATOR.API.updateRecord(config);
+        await ZOHO.CREATOR.API.updateRecord(config);
       }
       catch (err) {
         console.log(err);
@@ -804,6 +833,41 @@ ZOHO.CREATOR.init()
       }
     }
 
+    const createInvoiceNo = async () => {
+      config = {
+        appName: "village-raja-order-management",
+        reportName: "All_Order_Report"
+      }
+      try {
+        const order_resp = await ZOHO.CREATOR.API.getAllRecords(config);
+        if (order_resp.code == 3000) {
+          const orderArr = order_resp.data;
+          const max_no = orderArr.reduce((acc, curr) => {
+            if (curr.Inv_No > acc) {
+              acc = parseInt(curr.Inv_No);
+            }
+            return acc;
+          }, 0);
+          const zeros = "00000";
+          const new_no = max_no + 1;
+          const max_len = new_no.toString();
+          const zero_len = zeros.length;
+          const rem_len = zero_len - max_len.length;
+          const rem_zeros = zeros.substring(0, rem_len);
+          const order_id = `INV-${rem_zeros + new_no}`;
+
+          return {
+            "inv_no": order_id,
+            "max_no": new_no
+          }
+            ;
+        }
+      }
+      catch (err) {
+        return 0;
+      }
+    }
+
     const getItemObj = async (ID) => {
       config = {
         appName: "village-raja-order-management",
@@ -820,33 +884,39 @@ ZOHO.CREATOR.init()
       }
     }
 
-  
-    document.addEventListener("click",(event)=>{
-     const target_class_list = Array.from(event.target.classList);
-     if(target_class_list.includes("cat-btn")){
-      const category_name = event.target.getAttribute("category");
-      const item_cards = document.querySelectorAll(".item-card");
-      for (let i = 0; i < item_cards.length; i++) {
-        const element = item_cards[i];
-        const item_cat = element.getAttribute("category");
-        if(item_cat == category_name){
-          element.classList.remove("d-none");
-        }
-        else{
-          element.classList.add("d-none");
+
+    document.addEventListener("click", (event) => {
+      const target_class_list = Array.from(event.target.classList);
+      if (target_class_list.includes("cat-btn")) {
+        const category_name = event.target.getAttribute("category");
+        const item_cards = document.querySelectorAll(".item-card");
+        for (let i = 0; i < item_cards.length; i++) {
+          const element = item_cards[i];
+          const item_cat = element.getAttribute("category");
+          if (item_cat == category_name) {
+            element.classList.remove("d-none");
+          }
+          else {
+            element.classList.add("d-none");
+          }
         }
       }
-     }
-     else if(event.target.id == "all-cat"){
-      const item_cards = document.querySelectorAll(".item-card");
-      for (let i = 0; i < item_cards.length; i++) {
-        const element = item_cards[i];
+      else if (event.target.id == "all-cat") {
+        const item_cards = document.querySelectorAll(".item-card");
+        for (let i = 0; i < item_cards.length; i++) {
+          const element = item_cards[i];
           element.classList.remove("d-none");
-        
+
+        }
       }
-     }
     })
 
+
+
+    document.querySelector("#pay-later").addEventListener("click", async () => {
+     const order_obj =  await createOrder("Pending");
+     await orderSucccessALert(order_obj.order_id);
+    })
 
 
     // ZC Ends

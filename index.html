@@ -19,7 +19,7 @@
     <div class="container-one">
       <nav class="navbar dark">
         <ul class="navbar-nav mx-3 mb-2 mb-lg-0 d-flex justify-content-between w-100">
-          <li class="nav-item"> <a class="navbar-brand text-white" href="#">Village Raja</a></li>
+          <li class="nav-item"> <a class="navbar-brand text-white fw-bold" href="#">Village Raja</a></li>
           <li class="nav-item">
             <form class="d-flex form-control rounded-pill bg-white" role="search">
               <div class="bg-white p-1"><i class="bi bi-search"></i></div>
@@ -110,7 +110,8 @@
               <div class="col-12 mt-3">
                 <div class="d-flex justify-content-center gap-3">
                   <button class="btn dark text-white" type="button" id="close-form">Back</button>
-                  <button class="btn dark text-white" type="button" id="create-order">Submit</button>
+                  <button class="btn dark text-white" type="button" id="create-order">Pay Now</button>
+                  <button class="btn dark text-white" type="button" id="pay-later">Pay Later</button>
                 </div>
               </div>
             </form>
@@ -131,7 +132,7 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="order-created" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="order-created" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-body">
