@@ -6,6 +6,9 @@
 .dark{
     background-color: #ca48bf !important;
 }
+.bubblegum-sans-regular{
+    font-family: "Bubblegum Sans", sans-serif;
+}
 
 .cursor-pointer{
     cursor: pointer;
@@ -258,6 +261,9 @@ width: 75px;
 @media(width < 700px){
     .village-logo{
         font-size: 15px !important;
+    }
+    nav .navbar-brand{
+        font-size: 15px;
     }
     .img-fluid{
         height: 80px !important;

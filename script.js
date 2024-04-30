@@ -110,7 +110,7 @@ ZOHO.CREATOR.init()
                          <div class="w-100 text-center mt-2 btn-type" id='btn-type${i}' >
                          ${(itemArr[i].Available_Stock > 0) ?
                         `<button class='btn btn-secondary add-cart btn-sm shadow' btn-type='add' item-id="${itemArr[i].ID}">Add</button>` : 
-                         `<button class='btn btn-light btn-sm disabled fs-10 shadow' disabled>Out Of Stock</button>`}
+                         `<button class='btn btn-light btn-sm disabled fs-10 rounded' disabled>Out Of Stock</button>`}
                          </div>
                          <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock?itemArr[i].Available_Stock:0} in stock</small>
                          </div>
