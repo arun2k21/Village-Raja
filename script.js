@@ -581,7 +581,7 @@ ZOHO.CREATOR.init()
 
     document.addEventListener("click", (event) => {
       if (event.target.id == "place-order") {
-        const list_groups = document.querySelectorAll(".list-group-item");
+        const list_groups = document.getElementsByClassName("list-group-item");
         if (list_groups) {
           if (list_groups.length > 0) {
             const order_details = createOrderJSON();
@@ -681,9 +681,8 @@ ZOHO.CREATOR.init()
       }
       try {
         const resp = await ZOHO.CREATOR.API.addRecord(config);
-        console.log(resp.data.ID);
         if (resp.code == 3000) {
-          await createOrderListItems(resp);
+          await createOrderListItems(resp.data);
           await deleteItemNotInCart();
           await sendNotification(resp.data.ID);
           return {
@@ -741,8 +740,7 @@ ZOHO.CREATOR.init()
       const itemArr_resp = localStorage.getItem("Data1");
       const itemArr = JSON.parse(itemArr_resp);
       try {
-        const response = await resp;
-        if (response.code == 3000) {
+        const response = resp;
           itemArr.forEach(async (item_obj, i) => {
             i++;
             try {
@@ -753,7 +751,7 @@ ZOHO.CREATOR.init()
                   "Quantity": item_obj.Qty,
                   "Price": getItemZoho.Selling_Price,
                   "S_No": i,
-                  "Order_ID": response.data.ID,
+                  "Order_ID": response.ID,
                   "Category": getItemZoho.Category.ID
                 }
               }
@@ -775,7 +773,6 @@ ZOHO.CREATOR.init()
             }
 
           })
-        }
       }
       catch (err) {
         console.log(err);
@@ -906,7 +903,6 @@ ZOHO.CREATOR.init()
         for (let i = 0; i < item_cards.length; i++) {
           const element = item_cards[i];
           element.classList.remove("d-none");
-
         }
       }
     })
