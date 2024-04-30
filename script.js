@@ -713,7 +713,7 @@ ZOHO.CREATOR.init()
       const image = document.querySelector("#screenshot").files[0];
       const config = {
         appName: "village-raja-order-management",
-        reportName: "All_Orders",
+        reportName: "All_Order_Report",
         id: order_id,
         fieldName: "Upload_Screenshot",
         file: image
