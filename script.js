@@ -630,7 +630,7 @@ ZOHO.CREATOR.init()
       {
       if (screenshot) {
         await animationLoader("Start");
-        const order_obj = await createOrder("Paid");
+        const order_obj = await createOrder("Pending");
         await updateScreenShot(order_obj.record_id);
         await sendNotification(order_obj.record_id);
         await orderSucccessALert(order_obj.order_id);
