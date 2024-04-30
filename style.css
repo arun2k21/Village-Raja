@@ -119,7 +119,9 @@ width: 75px;
     background-color: var(--primaryColor);
     position: absolute;
 }
-
+.fs-10{
+    font-size: 10px !important;
+}
 .circle{
     width: 25px;
     height: 25px;

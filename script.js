@@ -108,8 +108,9 @@ ZOHO.CREATOR.init()
                        <div class="col-4">
                          <div class="card-body text-center"><img src="${product_img}" class="img-fluid rounded">
                          <div class="w-100 text-center mt-2 btn-type" id='btn-type${i}' >
-                         ${(itemArr[i].Available_Stock > 0) ? `<button class='btn btn-secondary add-cart btn-sm shadow' btn-type='add' item-id="${itemArr[i].ID}">Add</button>` : 
-                         `<button class='btn btn-light btn-sm disabled' disabled>Out Of Stock</button>`}
+                         ${(itemArr[i].Available_Stock > 0) ?
+                        `<button class='btn btn-secondary add-cart btn-sm shadow' btn-type='add' item-id="${itemArr[i].ID}">Add</button>` : 
+                         `<button class='btn btn-light btn-sm disabled fs-10 shadow' disabled>Out Of Stock</button>`}
                          </div>
                          <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock?itemArr[i].Available_Stock:0} in stock</small>
                          </div>
@@ -624,23 +625,34 @@ ZOHO.CREATOR.init()
     const createOrderBtn = document.querySelector("#create-order");
     createOrderBtn.addEventListener("click", async () => {
       const screenshot = document.querySelector("#screenshot").files[0];
+      const prev_order_payment = document.querySelector("#prev-amount").value
+      if(prev_order_payment)
+      {
       if (screenshot) {
         await animationLoader("Start");
         const order_obj = await createOrder("Paid");
         await updateScreenShot(order_obj.record_id);
+        await sendNotification(order_obj.record_id);
         await orderSucccessALert(order_obj.order_id);
         await animationLoader("Stop");
       }
       else {
         window.alert("Please upload the previous order payment screenshot to create order");
       }
+    }
+    else{
+      window.alert("Please enter the previous order payment amount");
+    }
 
     })
 
     const sendNotification = async (order_id) => {
+
+      const prev_order_payment = document.querySelector("#prev-amount").value;
       formData = {
         "data": {
-          "Send_Notification": "true"
+          "Send_Notification": "true",
+          "Previous_Order_Amount" : prev_order_payment
         }
       }
       config = {
@@ -672,7 +684,6 @@ ZOHO.CREATOR.init()
     }
 
     const createOrder = async (status) => {
-      
       const currentDate = zohoCurrentDate();
       const branch_resp = await getFranchiseDetails();
       const branch_id = branch_resp.data[0];
@@ -702,7 +713,6 @@ ZOHO.CREATOR.init()
         if (resp.code == 3000) {
           await createOrderListItems(resp.data);
           await deleteItemNotInCart();
-          await sendNotification(resp.data.ID);
           return {
             "record_id": resp.data.ID,
             "order_id": order_id.order_id
