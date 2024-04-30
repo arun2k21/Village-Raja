@@ -108,9 +108,10 @@ ZOHO.CREATOR.init()
                        <div class="col-4">
                          <div class="card-body text-center"><img src="${product_img}" class="img-fluid rounded">
                          <div class="w-100 text-center mt-2 btn-type" id='btn-type${i}' >
-                         ${(itemArr[i].Available_Stock > 0) ? `<button class='btn btn-secondary add-cart btn-sm shadow' btn-type='add' item-id="${itemArr[i].ID}">Add</button>` : `${outOfStockBtn()}`}
+                         ${(itemArr[i].Available_Stock > 0) ? `<button class='btn btn-secondary add-cart btn-sm shadow' btn-type='add' item-id="${itemArr[i].ID}">Add</button>` : 
+                         `<button class='btn btn-light btn-sm disabled' disabled>Out Of Stock</button>`}
                          </div>
-                         <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock} in stock</small>
+                         <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock?itemArr[i].Available_Stock:0} in stock</small>
                          </div>
                        </div>
                      </div> 
@@ -533,7 +534,7 @@ ZOHO.CREATOR.init()
         const category_response = await ZOHO.CREATOR.API.getAllRecords(config);
         const cate_list = category_response.data;
         let cat_html = `<div class="text-center category cursor-pointer">
-      <div class="cat rounded-circle"><img src="serviceorg-normal.png" height="75" width="75" class="rounded-circle" id="all-cat"></div>
+      <div class="cat rounded-circle"><img src="TVR NEW LOGO.jpg" height="75" width="75" class="rounded-circle" id="all-cat"></div>
       <div class="text-secondary fw-bold" style="font-size: 12px;">All</div>
     </div>`;
         let x = 0;
@@ -569,7 +570,7 @@ ZOHO.CREATOR.init()
               "Item_ID": item_id,
               "Item_Name": item_name,
               "Qty": qty,
-              "Price": price
+              "Price": price,
             }
           )
         }
@@ -624,7 +625,7 @@ ZOHO.CREATOR.init()
     createOrderBtn.addEventListener("click", async () => {
       const screenshot = document.querySelector("#screenshot").files[0];
       if (screenshot) {
-       const order_obj = await createOrder("Paid");
+        const order_obj = await createOrder("Paid");
         await updateScreenShot(order_obj.record_id);
         await orderSucccessALert(order_obj.order_id);
       }
@@ -644,12 +645,12 @@ ZOHO.CREATOR.init()
         appName: "village-raja-order-management",
         reportName: "All_Order_Report",
         id: order_id,
-        data : formData
+        data: formData
       }
-      try{
-      await ZOHO.CREATOR.API.updateRecord(config);
+      try {
+        await ZOHO.CREATOR.API.updateRecord(config);
       }
-      catch(err){
+      catch (err) {
         console.log(err);
       }
 
@@ -686,8 +687,8 @@ ZOHO.CREATOR.init()
           await deleteItemNotInCart();
           await sendNotification(resp.data.ID);
           return {
-            "record_id" : resp.data.ID,
-            "order_id" : order_id
+            "record_id": resp.data.ID,
+            "order_id": order_id
           }
         }
       }
@@ -739,45 +740,48 @@ ZOHO.CREATOR.init()
     const createOrderListItems = async (resp) => {
       const itemArr_resp = localStorage.getItem("Data1");
       const itemArr = JSON.parse(itemArr_resp);
+      const response = await resp;
+      
       try {
-        const response = resp;
-          itemArr.forEach(async (item_obj, i) => {
-            i++;
-            try {
-              const getItemZoho = await getItemObj(item_obj.Item_ID);
-              formData = {
-                "data": {
-                  "Item": item_obj.Item_ID,
-                  "Quantity": item_obj.Qty,
-                  "Price": getItemZoho.Selling_Price,
-                  "S_No": i,
-                  "Order_ID": response.ID,
-                  "Category": getItemZoho.Category.ID
-                }
-              }
-              config = {
-                appName: "village-raja-order-management",
-                formName: "Order_Item_SF",
-                data: formData
-              }
-              try {
-                await ZOHO.CREATOR.API.addRecord(config);
-                await updateStock(getItemZoho, item_obj.Qty);
-              }
-              catch (error) {
-                console.log(error);
-              }
+        for (let i = 0; i < itemArr.length; i++) {
+          const item_obj = itemArr[i];
+          const item_id = item_obj.Item_ID;
+          const getItemZoho = await getItemObj(item_id);
+          const formData = {
+            "data": {
+              "Item": item_obj.Item_ID,
+              "Quantity": item_obj.Qty,
+              "Price": getItemZoho.data.Selling_Price,
+              "S_No": i + 1,
+              "Order_ID": response.ID,
+              "Category": getItemZoho.data.Category.ID,
+              "Approval_Status" : getItemZoho.data.Category.display_value == "Milk"? "Waiting For Approval": "Approval Not Required" 
             }
-            catch (err) {
+          };
+          
+          const config = {
+            appName: "village-raja-order-management",
+            formName: "Order_Item_SF",
+            data: formData
+          };
+          
+          try {
+            await ZOHO.CREATOR.API.addRecord(config);
+            try {
+              await updateStock(getItemZoho.data, item_obj.Qty);
+            } catch (err) {
               console.log(err);
             }
-
-          })
-      }
-      catch (err) {
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      } catch (err) {
         console.log(err);
+        window.alert(err);
       }
-    }
+    };
+    
 
     const updateStock = async (item_obj, qty) => {
       const rem_stock = item_obj.Available_Stock - qty;
@@ -865,19 +869,17 @@ ZOHO.CREATOR.init()
       }
     }
 
-    const getItemObj = async (ID) => {
-      config = {
-        appName: "village-raja-order-management",
-        reportName: "All_Products",
-        criteria: `ID == ${ID}`
-      }
+    const getItemObj = async (record_id) => {
       try {
-        const rec_obj = await ZOHO.CREATOR.API.getAllRecords(config);
-        const rec_id = rec_obj.data[0];
-        return rec_id;
+        config = {
+          appName: "village-raja-order-management",
+          reportName: "All_Products",
+          id: record_id 
+        }
+        return ZOHO.CREATOR.API.getRecordById(config);
       }
       catch (err) {
-        return err;
+        console.log(err);
       }
     }
 
@@ -910,8 +912,8 @@ ZOHO.CREATOR.init()
 
 
     document.querySelector("#pay-later").addEventListener("click", async () => {
-     const order_obj =  await createOrder("Pending");
-     await orderSucccessALert(order_obj.order_id);
+      const order_obj = await createOrder("Pending");
+      await orderSucccessALert(order_obj.order_id);
     })
 
 
