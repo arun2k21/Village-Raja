@@ -665,7 +665,8 @@ ZOHO.CREATOR.init()
       const inv_no = await createInvoiceNo();
       formData = {
         "data": {
-          "Order_No": order_id,
+          "Order_No": order_id.order_id,
+          "Ord_No": order_id.ord_no,
           "Order_Date": currentDate,
           "Order_Status": "Pending",
           "Payment_Status": status,
@@ -688,7 +689,7 @@ ZOHO.CREATOR.init()
           await sendNotification(resp.data.ID);
           return {
             "record_id": resp.data.ID,
-            "order_id": order_id
+            "order_id": order_id.order_id
           }
         }
       }
@@ -814,8 +815,8 @@ ZOHO.CREATOR.init()
         if (order_resp.code == 3000) {
           const orderArr = order_resp.data;
           const max_no = orderArr.reduce((acc, curr) => {
-            if (curr.Auto_Number > acc) {
-              acc = parseInt(curr.Auto_Number);
+            if (curr.Ord_No > acc) {
+              acc = parseInt(curr.Ord_No);
             }
             return acc;
           }, 0);
@@ -826,11 +827,18 @@ ZOHO.CREATOR.init()
           const rem_len = zero_len - max_len.length;
           const rem_zeros = zeros.substring(0, rem_len);
           const order_id = `VR-${rem_zeros + new_no}`;
-          return order_id;
+          console.log(rem_zeros);
+          return{
+            "order_id" : order_id,
+            "ord_no" : new_no
+          }
         }
       }
       catch (err) {
-        return 0;
+        return {
+          "order_id" : `VR-0001`,
+          "ord_no" : 1
+        };
       }
     }
 
@@ -865,7 +873,10 @@ ZOHO.CREATOR.init()
         }
       }
       catch (err) {
-        return 0;
+        return {
+          "inv_no":  "INV-00001",
+          "max_no": 1
+        };
       }
     }
 
