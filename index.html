@@ -15,7 +15,34 @@
 </head>
 
 <body>
+  <div class="container-fluid position-fixed d-none 100vw" id="loading-animation">
+    <div class="line"></div>
+    <div class="loader">
+      <div class="one-loader first">
+       <div class="v-line first-line"></div>
+       <div class="circle first-circle"></div>
+      </div>
+      <div class="one-loader">
+       <div class="v-line middle-line"></div>
+       <div class="circle middle-circle"></div>
+      </div>
+      <div class="one-loader">
+       <div class="v-line middle-line"></div>
+       <div class="circle middle-circle"></div>
+      </div>
+      <div class="one-loader">
+       <div class="v-line middle-line"></div>
+       <div class="circle middle-circle"></div>
+      </div>
+      <div class="one-loader last">
+       <div class="v-line last-line"></div>
+       <div class="circle last-circle"></div>
+      </div>
+     </div>
+    <h3 class="fw-bold text-white">Creating Order...</h3>
+  </div>
   <div class="vr-container" style="height: 100vh; font-family: 'Montserrat', sans-serif;">
+    <div id="overlay" class="d-none"></div>
     <div class="container-one">
       <nav class="navbar dark">
         <ul class="navbar-nav mx-3 mb-2 mb-lg-0 d-flex justify-content-between w-100">
@@ -114,8 +141,7 @@
               <div class="col-12 mt-3">
                 <div class="d-flex justify-content-center gap-3">
                   <button class="btn dark text-white" type="button" id="close-form">Back</button>
-                  <button class="btn dark text-white" type="button" id="create-order">Pay Now</button>
-                  <button class="btn dark text-white" type="button" id="pay-later">Pay Later</button>
+                  <button class="btn dark text-white" type="button" id="create-order">Confirm Order</button>
                 </div>
               </div>
             </form>

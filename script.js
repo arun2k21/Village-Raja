@@ -625,12 +625,14 @@ ZOHO.CREATOR.init()
     createOrderBtn.addEventListener("click", async () => {
       const screenshot = document.querySelector("#screenshot").files[0];
       if (screenshot) {
+        await animationLoader("Start");
         const order_obj = await createOrder("Paid");
         await updateScreenShot(order_obj.record_id);
         await orderSucccessALert(order_obj.order_id);
+        await animationLoader("Stop");
       }
       else {
-        window.alert("Please upload the payment screenshot to create order");
+        window.alert("Please upload the previous order payment screenshot to create order");
       }
 
     })
@@ -656,7 +658,21 @@ ZOHO.CREATOR.init()
 
     }
 
+    const animationLoader =(type)=>{
+      if(type == "Start"){
+        document.querySelector("#loading-animation").classList.remove("d-none");
+        document.querySelector("#overlay").classList.remove("d-none");
+        document.querySelector(".vr-container").classList.add("overflow-hidden");
+      }
+      else{
+        document.querySelector("#loading-animation").classList.add("d-none");
+        document.querySelector("#overlay").classList.add("d-none");
+        document.querySelector(".vr-container").classList.remove("overflow-hidden");
+      }
+    }
+
     const createOrder = async (status) => {
+      
       const currentDate = zohoCurrentDate();
       const branch_resp = await getFranchiseDetails();
       const branch_id = branch_resp.data[0];
@@ -918,13 +934,6 @@ ZOHO.CREATOR.init()
           element.classList.remove("d-none");
         }
       }
-    })
-
-
-
-    document.querySelector("#pay-later").addEventListener("click", async () => {
-      const order_obj = await createOrder("Pending");
-      await orderSucccessALert(order_obj.order_id);
     })
 
 
