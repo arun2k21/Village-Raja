@@ -637,11 +637,13 @@ ZOHO.CREATOR.init()
         await animationLoader("Stop");
       }
       else {
-        window.alert("Please upload the previous order payment screenshot to create order");
+        const modalElement = document.querySelector("#no-screenshot");
+        $('#no-screenshot').modal('show');
       }
     }
     else{
-      window.alert("Please enter the previous order payment amount");
+      const modalElement = document.querySelector("#no-amount");
+        $("#no-amount").modal('show');
     }
 
     })
