@@ -109,10 +109,10 @@ ZOHO.CREATOR.init()
                          <div class="card-body text-center"><img src="${product_img}" class="img-fluid rounded">
                          <div class="w-100 text-center mt-2 btn-type" id='btn-type${i}' >
                          ${(itemArr[i].Available_Stock > 0) ?
-                        `<button class='btn btn-secondary add-cart btn-sm shadow' btn-type='add' item-id="${itemArr[i].ID}">Add</button>` : 
-                         `<button class='btn btn-light btn-sm disabled fs-10 rounded' disabled>Out Of Stock</button>`}
+              `<button class='btn btn-secondary add-cart btn-sm shadow' btn-type='add' item-id="${itemArr[i].ID}">Add</button>` :
+              `<button class='btn btn-light btn-sm disabled fs-10 rounded' disabled>Out Of Stock</button>`}
                          </div>
-                         <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock?itemArr[i].Available_Stock:0} in stock</small>
+                         <small class="fw-bold text-nowrap">${itemArr[i].Available_Stock ? itemArr[i].Available_Stock : 0} in stock</small>
                          </div>
                        </div>
                      </div> 
@@ -626,25 +626,24 @@ ZOHO.CREATOR.init()
     createOrderBtn.addEventListener("click", async () => {
       const screenshot = document.querySelector("#screenshot").files[0];
       const prev_order_payment = document.querySelector("#prev-amount").value
-      if(prev_order_payment)
-      {
-      if (screenshot) {
-        await animationLoader("Start");
-        const order_obj = await createOrder("Pending");
-        await updateScreenShot(order_obj.record_id);
-        await sendNotification(order_obj.record_id);
-        await orderSucccessALert(order_obj.order_id);
-        await animationLoader("Stop");
+      if (prev_order_payment) {
+        if (screenshot) {
+          await animationLoader("Start");
+          const order_obj = await createOrder("Pending");
+          await updateScreenShot(order_obj.record_id);
+          await sendNotification(order_obj.record_id);
+          await orderSucccessALert(order_obj.order_id);
+          await animationLoader("Stop");
+        }
+        else {
+          const modalElement = document.querySelector("#no-screenshot");
+          $('#no-screenshot').modal('show');
+        }
       }
       else {
-        const modalElement = document.querySelector("#no-screenshot");
-        $('#no-screenshot').modal('show');
-      }
-    }
-    else{
-      const modalElement = document.querySelector("#no-amount");
+        const modalElement = document.querySelector("#no-amount");
         $("#no-amount").modal('show');
-    }
+      }
 
     })
 
@@ -654,7 +653,7 @@ ZOHO.CREATOR.init()
       formData = {
         "data": {
           "Send_Notification": "true",
-          "Previous_Order_Amount" : prev_order_payment
+          "Previous_Order_Amount": prev_order_payment
         }
       }
       config = {
@@ -672,13 +671,13 @@ ZOHO.CREATOR.init()
 
     }
 
-    const animationLoader =(type)=>{
-      if(type == "Start"){
+    const animationLoader = (type) => {
+      if (type == "Start") {
         document.querySelector("#loading-animation").classList.remove("d-none");
         document.querySelector("#overlay").classList.remove("d-none");
         document.querySelector(".vr-container").classList.add("overflow-hidden");
       }
-      else{
+      else {
         document.querySelector("#loading-animation").classList.add("d-none");
         document.querySelector("#overlay").classList.add("d-none");
         document.querySelector(".vr-container").classList.remove("overflow-hidden");
@@ -770,12 +769,13 @@ ZOHO.CREATOR.init()
       const itemArr_resp = localStorage.getItem("Data1");
       const itemArr = JSON.parse(itemArr_resp);
       const response = await resp;
-      
+
       try {
         for (let i = 0; i < itemArr.length; i++) {
           const item_obj = itemArr[i];
           const item_id = item_obj.Item_ID;
           const getItemZoho = await getItemObj(item_id);
+          const sub_total = parseInt(item_obj.Qty?item_obj.Qty:0) * parseFloat(getItemZoho.data.Selling_Price?getItemZoho.data.Selling_Price:0);
           const formData = {
             "data": {
               "Item": item_obj.Item_ID,
@@ -783,17 +783,18 @@ ZOHO.CREATOR.init()
               "Price": getItemZoho.data.Selling_Price,
               "S_No": i + 1,
               "Order_ID": response.ID,
+              "Total": sub_total,
               "Category": getItemZoho.data.Category.ID,
-              "Approval_Status" : getItemZoho.data.Category.display_value == "Milk"? "Waiting For Approval": "Approval Not Required" 
+              "Approval_Status": getItemZoho.data.Category.display_value == "Milk" ? "Waiting For Approval" : "Approval Not Required"
             }
           };
-          
+
           const config = {
             appName: "village-raja-order-management",
             formName: "Order_Item_SF",
             data: formData
           };
-          
+
           try {
             await ZOHO.CREATOR.API.addRecord(config);
             try {
@@ -810,7 +811,7 @@ ZOHO.CREATOR.init()
         window.alert(err);
       }
     };
-    
+
 
     const updateStock = async (item_obj, qty) => {
       const rem_stock = item_obj.Available_Stock - qty;
@@ -856,16 +857,16 @@ ZOHO.CREATOR.init()
           const rem_zeros = zeros.substring(0, rem_len);
           const order_id = `VR-${rem_zeros + new_no}`;
           console.log(rem_zeros);
-          return{
-            "order_id" : order_id,
-            "ord_no" : new_no
+          return {
+            "order_id": order_id,
+            "ord_no": new_no
           }
         }
       }
       catch (err) {
         return {
-          "order_id" : `VR-0001`,
-          "ord_no" : 1
+          "order_id": `VR-0001`,
+          "ord_no": 1
         };
       }
     }
@@ -902,7 +903,7 @@ ZOHO.CREATOR.init()
       }
       catch (err) {
         return {
-          "inv_no":  "INV-00001",
+          "inv_no": "INV-00001",
           "max_no": 1
         };
       }
@@ -913,7 +914,7 @@ ZOHO.CREATOR.init()
         config = {
           appName: "village-raja-order-management",
           reportName: "All_Products",
-          id: record_id 
+          id: record_id
         }
         return ZOHO.CREATOR.API.getRecordById(config);
       }
