@@ -785,6 +785,7 @@ ZOHO.CREATOR.init()
               "Order_ID": response.ID,
               "Total": sub_total,
               "Category": getItemZoho.data.Category.ID,
+              "Milk_Deliver_Status" : getItemZoho.data.Category.display_value == "Milk" ? "Pending" : "",
               "Approval_Status": getItemZoho.data.Category.display_value == "Milk" ? "Waiting For Approval" : "Approval Not Required"
             }
           };
