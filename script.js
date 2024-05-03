@@ -624,36 +624,17 @@ ZOHO.CREATOR.init()
 
     const createOrderBtn = document.querySelector("#create-order");
     createOrderBtn.addEventListener("click", async () => {
-      const screenshot = document.querySelector("#screenshot").files[0];
-      const prev_order_payment = document.querySelector("#prev-amount").value
-      if (prev_order_payment) {
-        if (screenshot) {
-          await animationLoader("Start");
-          const order_obj = await createOrder("Pending");
-          await updateScreenShot(order_obj.record_id);
-          await sendNotification(order_obj.record_id);
-          await orderSucccessALert(order_obj.order_id);
-          await animationLoader("Stop");
-        }
-        else {
-          const modalElement = document.querySelector("#no-screenshot");
-          $('#no-screenshot').modal('show');
-        }
-      }
-      else {
-        const modalElement = document.querySelector("#no-amount");
-        $("#no-amount").modal('show');
-      }
-
+      await animationLoader("Start");
+      const order_obj = await createOrder("Pending");
+      await sendNotification(order_obj.record_id);
+      await orderSucccessALert(order_obj.order_id);
+      await animationLoader("Stop");
     })
 
     const sendNotification = async (order_id) => {
-
-      const prev_order_payment = document.querySelector("#prev-amount").value;
       formData = {
         "data": {
           "Send_Notification": "true",
-          "Previous_Order_Amount": prev_order_payment
         }
       }
       config = {
@@ -726,9 +707,9 @@ ZOHO.CREATOR.init()
     }
 
     const orderSucccessALert = (order_id) => {
-      const alert_msg = `Your Order No ${order_id} has been placed successfully`;
       const modalElement = document.querySelector("#order-created");
-      modalElement.querySelector(".modal-body").textContent = alert_msg;
+      modalElement.querySelector(".modal-header").textContent = `Order No ${order_id} has been created`
+      modalElement.querySelector(".modal-body").textContent = "Kindly clear your pending invoice amount to confirm your order";
       $('#order-created').modal('show');
     }
 
@@ -737,22 +718,6 @@ ZOHO.CREATOR.init()
     })
 
 
-    const updateScreenShot = async (order_id) => {
-      const image = document.querySelector("#screenshot").files[0];
-      const config = {
-        appName: "village-raja-order-management",
-        reportName: "All_Order_Report",
-        id: order_id,
-        fieldName: "Upload_Screenshot",
-        file: image
-      }
-      try {
-        const resp = await ZOHO.CREATOR.API.uploadFile(config);
-      }
-      catch (err) {
-        console.log(err);
-      }
-    }
 
     const getMonthStr = (mon) => {
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

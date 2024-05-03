@@ -131,14 +131,6 @@
                 <label for="payment-date" class="form-label">Payment Date</label>
                 <input type="date" class="form-control" id="payment-date" required>
               </div>
-              <div class="mb-3">
-                <label for="screenshot" class="form-label">Previous Payment Screenshot</label>
-                <input type="file" class="form-control" id="screenshot" required>
-              </div>
-              <div class="mb-3">
-                <label for="screenshot" class="form-label">Previous Order Amount</label>
-                <input type="number" class="form-control" id="prev-amount" required>
-              </div>
               <div class="col-12 mt-3">
                 <div class="d-flex justify-content-center gap-3">
                   <button class="btn dark text-white" type="button" id="close-form">Back</button>
@@ -166,32 +158,12 @@
     <div class="modal fade" id="order-created" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="fw-bold">Order Created</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
           <div class="modal-body">
-            This product is currently out of stock. We're working to restock it as soon as possible.
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-primary" data-bs-dismiss="modal" id="close-order">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal fade" id="no-screenshot" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-body">
-            Please upload the previous order payment screenshot to create order      
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-primary" data-bs-dismiss="modal" id="close-order">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="modal fade" id="no-amount" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-body">
-            Please enter the previous order payment amount  to confirm the order    
+            Kindly clear your pending invoice amount to confirm your order
           </div>
           <div class="modal-footer">
             <button class="btn btn-primary" data-bs-dismiss="modal" id="close-order">Close</button>
